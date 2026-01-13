@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка на согласование/изменение договорных документов</title>
+    <!-- Библиотеки для генерации PDF с поддержкой кириллицы -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        h1 { color: #1f3c88; text-align: center; margin-bottom: 30px; }
+        .instruction { background: #e3f2fd; padding: 15px; border-left: 5px solid #1f3c88; margin-bottom: 20px; font-weight: bold; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px; transition: border-color 0.3s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1f3c88; }
+        textarea { resize: vertical; min-height: 100px; }
+        .required { color: #d32f2f; }
+        .section { margin: 25px 0; padding: 20px; border: 1px solid #eee; border-radius: 8px; }
+        .conditional { display: none; margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 5px; }
+        .conditional.active { display: block; }
+        button { background: #1f3c88; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 20px; transition: background 0.3s; }
+        button:hover { background: #153f6e; }
+        .error-message { color: #d32f2f; font-size: 14px; margin-top: 5px; display: none; }
+        .field-error { border-color: #d32f2f !important; }
+        @media (max-width: 768px) { .container { padding: 20px; margin: 10px; } input, select, textarea { font-size: 18px; } }
+        
+        /* Модальное окно */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            animation: modalAppear 0.3s ease-out;
+        }
+        @keyframes modalAppear {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .modal-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+        .modal-title {
+            color: #1f3c88;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .modal-text {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .modal-btn {
+            background: #1f3c88;
+            color: white;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .modal-btn:hover {
+            background: #153f6e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Заявка на согласование/изменение договорных документов</h1>
+        
+        <div class="instruction">
+            Заполните форму подробно и детально
+        </div>
+
+        <form id="documentForm">
+            
+            <!-- 1. Номер заявки -->
+            <div class="section">
+                <label for="requestNumber">Номер заявки</label>
+                <input type="text" id="requestNumber" name="Номер заявки" readonly style="background-color: #f0f0f0; cursor: not-allowed;">
+            </div>
+
+            <!-- 2. Инициатор заявки -->
+            <div class="section">
+                <label for="initiator">Инициатор заявки (ФИО) <span class="required">*</span></label>
+                <input type="text" id="initiator" name="Инициатор заявки" required minlength="2" maxlength="100" oninput="updateRequestNumber()">
+            </div>
+
+            <!-- 3. Дата заявки -->
+            <div class="section">
+                <label for="date">Дата заявки <span class="required">*</span></label>
+                <input type="date" id="date" name="Дата заявки" required>
+            </div>
+
+            <!-- 4. Тип заявки -->
+            <div class="section">
+                <label for="requestType">Тип заявки <span class="required">*</span></label>
+                <select id="requestType" name="Тип заявки" required onchange="toggleChangesRequired()">
+                    <option value="">Выберите тип</option>
+                    <option value="Изменение">Изменение</option>
+                    <option value="Расторжение">Расторжение</option>
+                </select>
+            </div>
+
+            <!-- 5. Основные поля формы -->
+            <div class="section">
+                <label for="docType">Вид договорного документа <span class="required">*</span></label>
+                <select id="docType" name="Вид документа" required>
+                    <option value="">Выберите вид</option>
+                    <option value="Договор">Договор</option>
+                    <option value="Дополнительное соглашение">Дополнительное соглашение</option>
+                    <option value="Прочие документы">Прочие документы</option>
+                </select>
+
+                <label for="docName">Наименование документа <span class="required">*</span></label>
+                <input type="text" id="docName" name="Наименование документа" required minlength="10" maxlength="100">
+
+                <label for="docContent">Содержание документа <span class="required">*</span></label>
+                <textarea id="docContent" name="Содержание документа" required minlength="50" maxlength="500"></textarea>
+            </div>
+
+            <!-- 6. Контрагент -->
+            <div class="section">
+                <label for="contractorName">Наименование контрагента <span class="required">*</span></label>
+                <input type="text" id="contractorName" name="Контрагент" required minlength="10" maxlength="100">
+
+                <label for="existingContact">Контактное лицо <span class="required">*</span></label>
+                <input type="text" id="existingContact" name="Контактное лицо" required minlength="10" maxlength="100">
+
+                <label for="existingPhone">Телефон <span class="required">*</span></label>
+                <input type="tel" id="existingPhone" name="Телефон" required minlength="12" maxlength="20" placeholder="+7 XXX XXX XX XX" pattern="\+7\s?.+">
+
+                <label for="existingEmail">Email <span class="required">*</span></label>
+                <input type="email" id="existingEmail" name="Email контрагента" required minlength="10" maxlength="100">
+
+                <label for="hasDocuments">Наличие уставных документов <span class="required">*</span></label>
+                <select id="hasDocuments" name="Уставные документы" required onchange="toggleDocumentDate()">
+                    <option value="">Выберите</option>
+                    <option value="Да">Да</option>
+                    <option value="Нет">Нет</option>
+                </select>
+                <div id="documentDateBlock" class="conditional">
+                    <label for="docDate">Дата предоставления документов <span class="required">*</span></label>
+                    <input type="date" id="docDate" name="Дата документов">
+                </div>
+            </div>
+
+            <!-- 7. ЭДО -->
+            <div class="section">
+                <label>
+                    <input type="checkbox" id="edoAvailable" name="ЭДО доступно" onchange="toggleEDO()"> 
+                    Возможность работы с ЭДО
+                </label>
+                <div id="edoSystem" class="conditional">
+                    <label for="edoName">Наименование ЭДО-системы <span class="required">*</span></label>
+                    <input type="text" id="edoName" name="ЭДО система" minlength="10" maxlength="100">
+                </div>
+            </div>
+
+            <!-- 8. Тип документа -->
+            <div class="section">
+                <label for="docCategory">Тип договорного документа <span class="required">*</span></label>
+                <select id="docCategory" name="Тип документа" required onchange="toggleDocCategory()">
+                    <option value="">Выберите тип</option>
+                    <option value="Подрядчик">с Подрядчиком</option>
+                    <option value="Поставщик">с Поставщиком</option>
+                    <option value="Заказчик">с Заказчиком</option>
+                </select>
+
+                <!-- Подрядчик -->
+                <div id="contractorDetails" class="conditional">
+                    <label for="projectName">Название Проекта <span class="required">*</span></label>
+                    <input type="text" id="projectName" name="Проект подрядчик" minlength="5" maxlength="200">
+
+                    <label for="objectAddr">Адрес объекта <span class="required">*</span></label>
+                    <input type="text" id="objectAddr" name="Адрес подрядчик" minlength="10" maxlength="200">
+
+                    <label for="workType">Вид работ <span class="required">*</span></label>
+                    <input type="text" id="workType" name="Вид работ" minlength="10" maxlength="100">
+
+                    <label for="workCost">Стоимость работ <span class="required">*</span></label>
+                    <input type="text" id="workCost" name="Стоимость работ" minlength="10" maxlength="100">
+
+                    <label for="material">Наличие давальческого материала <span class="required">*</span></label>
+                    <select id="material" name="Давальческий материал">
+                        <option value="">Выберите</option>
+                        <option value="Да">Да</option>
+                        <option value="Нет">Нет</option>
+                    </select>
+
+                    <label for="advance">Сумма авансового платежа <span class="required">*</span></label>
+                    <input type="text" id="advance" name="Аванс" minlength="1" maxlength="100">
+
+                    <label for="paymentSchedule">Разбивка платежей <span class="required">*</span></label>
+                    <input type="text" id="paymentSchedule" name="График платежей" minlength="1" maxlength="100">
+
+                    <label for="guarantee">Гарантийные удержания <span class="required">*</span></label>
+                    <input type="text" id="guarantee" name="Гарантии" minlength="1" maxlength="100">
+
+                    <label for="startDate">Дата начала работ <span class="required">*</span></label>
+                    <input type="date" id="startDate" name="Начало работ">
+
+                    <label for="endDate">Дата окончания работ <span class="required">*</span></label>
+                    <input type="date" id="endDate" name="Окончание работ">
+
+                    <label for="keyChanges">Ключевые изменения <span class="required changes-required" style="display:none;">*</span></label>
+                    <textarea id="keyChanges" name="Изменения подрядчик" class="changes-field" maxlength="500"></textarea>
+                </div>
+
+                <!-- Поставщик -->
+                <div id="supplierDetails" class="conditional">
+                    <label for="supplierProject">Название Проекта <span class="required">*</span></label>
+                    <input type="text" id="supplierProject" name="Проект поставщик" minlength="5" maxlength="200">
+
+                    <label for="supplierAddr">Адрес объекта <span class="required">*</span></label>
+                    <input type="text" id="supplierAddr" name="Адрес поставщик" minlength="10" maxlength="200">
+
+                    <label for="nomenclature">Номенклатура поставки <span class="required">*</span></label>
+                    <textarea id="nomenclature" name="Номенклатура" minlength="10" maxlength="500"></textarea>
+
+                    <label for="supplyCost">Сумма поставки <span class="required">*</span></label>
+                    <input type="text" id="supplyCost" name="Сумма поставки" minlength="10" maxlength="100">
+
+                    <label for="supplierChanges">Ключевые изменения <span class="required changes-required" style="display:none;">*</span></label>
+                    <textarea id="supplierChanges" name="Изменения поставщик" class="changes-field" maxlength="500"></textarea>
+                </div>
+
+                <!-- Заказчик -->
+                <div id="customerDetails" class="conditional">
+                    <label for="customerProject">Название Проекта <span class="required">*</span></label>
+                    <input type="text" id="customerProject" name="Проект заказчик" minlength="5" maxlength="200">
+
+                    <label for="customerAddr">Адрес объекта <span class="required">*</span></label>
+                    <input type="text" id="customerAddr" name="Адрес заказчик" minlength="10" maxlength="200">
+
+                    <label for="customerChanges">Ключевые изменения <span class="required changes-required" style="display:none;">*</span></label>
+                    <textarea id="customerChanges" name="Изменения заказчик" class="changes-field" maxlength="500"></textarea>
+                </div>
+            </div>
+
+            <!-- 9. Особые условия -->
+            <div class="section">
+                <label for="specialConditions">Особые условия по договору</label>
+                <textarea id="specialConditions" name="Особые условия" maxlength="500"></textarea>
+            </div>
+
+            <button type="submit">Сформировать заявку</button>
+        </form>
+
+        <div class="instruction" style="margin-top: 20px;">
+            Заявка будет сохранена на вашем устройстве в формате PDF
+        </div>
+    </div>
+
+    <!-- Модальное окно успешной отправки -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+            </div>
+            <h2 class="modal-title">Заявка готова!</h2>
+            <p class="modal-text">Заявка готова к скачиванию,<br>сохраните заявку.</p>
+            <button class="modal-btn" onclick="closeModal()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        // Управление обязательными полями в условных блоках
+        function setRequiredFields(container, isRequired) {
+            const inputs = container.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                if (input.classList.contains('changes-field')) {
+                    return;
+                }
+                
+                const label = input.closest('.conditional, .section')?.querySelector(`label[for="${input.id}"]`);
+                const isMarkedRequired = label?.querySelector('.required') !== null;
+                
+                if (isMarkedRequired && input.type !== 'checkbox') {
+                    if (isRequired) {
+                        input.setAttribute('required', '');
+                    } else {
+                        input.removeAttribute('required');
+                    }
+                }
+            });
+        }
+
+        function toggleDocumentDate() {
+            const value = document.getElementById('hasDocuments').value;
+            const dateBlock = document.getElementById('documentDateBlock');
+            const showDate = value === 'Нет';
+            dateBlock.classList.toggle('active', showDate);
+            setRequiredFields(dateBlock, showDate);
+        }
+
+        function toggleChangesRequired() {
+            const requestType = document.getElementById('requestType').value;
+            const isChange = requestType === 'Изменение';
+            
+            document.querySelectorAll('.changes-required').forEach(star => {
+                star.style.display = isChange ? 'inline' : 'none';
+            });
+            
+            // Устанавливаем required только для полей в АКТИВНЫХ блоках
+            document.querySelectorAll('.changes-field').forEach(field => {
+                const container = field.closest('.conditional');
+                const isVisible = container && container.classList.contains('active');
+                
+                if (isChange && isVisible) {
+                    field.setAttribute('required', '');
+                    field.setAttribute('minlength', '10');
+                } else {
+                    field.removeAttribute('required');
+                    field.removeAttribute('minlength');
+                }
+            });
+        }
+
+        function toggleEDO() {
+            const checked = document.getElementById('edoAvailable').checked;
+            const edoSystem = document.getElementById('edoSystem');
+            edoSystem.classList.toggle('active', checked);
+            setRequiredFields(edoSystem, checked);
+        }
+
+        function toggleDocCategory() {
+            const category = document.getElementById('docCategory').value;
+            const contractorDetails = document.getElementById('contractorDetails');
+            const supplierDetails = document.getElementById('supplierDetails');
+            const customerDetails = document.getElementById('customerDetails');
+            
+            const isContractor = category === 'Подрядчик';
+            const isSupplier = category === 'Поставщик';
+            const isCustomer = category === 'Заказчик';
+            
+            contractorDetails.classList.toggle('active', isContractor);
+            supplierDetails.classList.toggle('active', isSupplier);
+            customerDetails.classList.toggle('active', isCustomer);
+            
+            setRequiredFields(contractorDetails, isContractor);
+            setRequiredFields(supplierDetails, isSupplier);
+            setRequiredFields(customerDetails, isCustomer);
+            
+            // Обновляем required для полей "Ключевые изменения" после смены категории
+            toggleChangesRequired();
+        }
+
+        // Функция для форматирования даты
+        function formatDateDisplay(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ru-RU');
+        }
+
+        // Создание HTML для PDF
+        function createPdfHtml() {
+            const requestNumber = document.getElementById('requestNumber').value;
+            const initiator = document.getElementById('initiator').value;
+            const date = formatDateDisplay(document.getElementById('date').value);
+            const requestType = document.getElementById('requestType').value;
+            const docType = document.getElementById('docType').value;
+            const docName = document.getElementById('docName').value;
+            const docContent = document.getElementById('docContent').value;
+            const contractorName = document.getElementById('contractorName').value;
+            const existingContact = document.getElementById('existingContact').value;
+            const existingPhone = document.getElementById('existingPhone').value;
+            const existingEmail = document.getElementById('existingEmail').value;
+            const hasDocuments = document.getElementById('hasDocuments').value;
+            const docDate = formatDateDisplay(document.getElementById('docDate').value);
+            const edoAvailable = document.getElementById('edoAvailable').checked;
+            const edoName = document.getElementById('edoName').value;
+            const docCategory = document.getElementById('docCategory').value;
+            const specialConditions = document.getElementById('specialConditions').value;
+
+            let html = `
+                <div style="font-family: Arial, sans-serif; padding: 20px; font-size: 12px; line-height: 1.6;">
+                    <h1 style="text-align: center; color: #1f3c88; font-size: 16px; margin-bottom: 20px;">
+                        ЗАЯВКА НА СОГЛАСОВАНИЕ/ИЗМЕНЕНИЕ ДОГОВОРНЫХ ДОКУМЕНТОВ
+                    </h1>
+                    
+                    <p><strong>Номер заявки:</strong> ${requestNumber || '—'}</p>
+                    <p><strong>Инициатор заявки:</strong> ${initiator || '—'}</p>
+                    <p><strong>Дата заявки:</strong> ${date || '—'}</p>
+                    <p><strong>Тип заявки:</strong> ${requestType || '—'}</p>
+                    
+                    <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
+                        ИНФОРМАЦИЯ О ДОКУМЕНТЕ
+                    </h2>
+                    <p><strong>Вид договорного документа:</strong> ${docType || '—'}</p>
+                    <p><strong>Наименование документа:</strong> ${docName || '—'}</p>
+                    <p><strong>Содержание документа:</strong> ${docContent || '—'}</p>
+                    
+                    <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
+                        КОНТРАГЕНТ
+                    </h2>
+                    <p><strong>Наименование контрагента:</strong> ${contractorName || '—'}</p>
+                    <p><strong>Контактное лицо:</strong> ${existingContact || '—'}</p>
+                    <p><strong>Телефон:</strong> ${existingPhone || '—'}</p>
+                    <p><strong>Email контрагента:</strong> ${existingEmail || '—'}</p>
+                    <p><strong>Наличие уставных документов:</strong> ${hasDocuments || '—'}</p>
+            `;
+
+            if (hasDocuments === 'Нет' && docDate) {
+                html += `<p><strong>Дата предоставления документов:</strong> ${docDate}</p>`;
+            }
+
+            html += `
+                    <p><strong>Возможность работы с ЭДО:</strong> ${edoAvailable ? 'Да' : 'Нет'}</p>
+            `;
+
+            if (edoAvailable && edoName) {
+                html += `<p><strong>Наименование ЭДО-системы:</strong> ${edoName}</p>`;
+            }
+
+            html += `<p><strong>Тип договорного документа:</strong> ${docCategory ? 'с ' + docCategory + 'ом' : '—'}</p>`;
+
+            // Детали в зависимости от типа
+            if (docCategory === 'Подрядчик') {
+                html += `
+                    <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
+                        ДЕТАЛИ (ПОДРЯДЧИК)
+                    </h2>
+                    <p><strong>Название проекта:</strong> ${document.getElementById('projectName').value || '—'}</p>
+                    <p><strong>Адрес объекта:</strong> ${document.getElementById('objectAddr').value || '—'}</p>
+                    <p><strong>Вид работ:</strong> ${document.getElementById('workType').value || '—'}</p>
+                    <p><strong>Стоимость работ:</strong> ${document.getElementById('workCost').value || '—'}</p>
+                    <p><strong>Наличие давальческого материала:</strong> ${document.getElementById('material').value || '—'}</p>
+                    <p><strong>Сумма авансового платежа:</strong> ${document.getElementById('advance').value || '—'}</p>
+                    <p><strong>Разбивка платежей:</strong> ${document.getElementById('paymentSchedule').value || '—'}</p>
+                    <p><strong>Гарантийные удержания:</strong> ${document.getElementById('guarantee').value || '—'}</p>
+                    <p><strong>Дата начала работ:</strong> ${formatDateDisplay(document.getElementById('startDate').value) || '—'}</p>
+                    <p><strong>Дата окончания работ:</strong> ${formatDateDisplay(document.getElementById('endDate').value) || '—'}</p>
+                    <p><strong>Ключевые изменения:</strong> ${document.getElementById('keyChanges').value || '—'}</p>
+                `;
+            } else if (docCategory === 'Поставщик') {
+                html += `
+                    <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
+                        ДЕТАЛИ (ПОСТАВЩИК)
+                    </h2>
+                    <p><strong>Название проекта:</strong> ${document.getElementById('supplierProject').value || '—'}</p>
+                    <p><strong>Адрес объекта:</strong> ${document.getElementById('supplierAddr').value || '—'}</p>
+                    <p><strong>Номенклатура поставки:</strong> ${document.getElementById('nomenclature').value || '—'}</p>
+                    <p><strong>Сумма поставки:</strong> ${document.getElementById('supplyCost').value || '—'}</p>
+                    <p><strong>Ключевые изменения:</strong> ${document.getElementById('supplierChanges').value || '—'}</p>
+                `;
+            } else if (docCategory === 'Заказчик') {
+                html += `
+                    <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
+                        ДЕТАЛИ (ЗАКАЗЧИК)
+                    </h2>
+                    <p><strong>Название проекта:</strong> ${document.getElementById('customerProject').value || '—'}</p>
+                    <p><strong>Адрес объекта:</strong> ${document.getElementById('customerAddr').value || '—'}</p>
+                    <p><strong>Ключевые изменения:</strong> ${document.getElementById('customerChanges').value || '—'}</p>
+                `;
+            }
+
+            if (specialConditions) {
+                html += `
+                    <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
+                        ОСОБЫЕ УСЛОВИЯ
+                    </h2>
+                    <p>${specialConditions}</p>
+                `;
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        // Генерация PDF документа с использованием pdfmake (поддержка кириллицы)
+        async function generatePdf(fileName) {
+            // Получаем данные формы
+            const requestNumber = document.getElementById('requestNumber').value;
+            const initiator = document.getElementById('initiator').value;
+            const date = formatDateDisplay(document.getElementById('date').value);
+            const requestType = document.getElementById('requestType').value;
+            const docType = document.getElementById('docType').value;
+            const docName = document.getElementById('docName').value;
+            const docContent = document.getElementById('docContent').value;
+            const contractorName = document.getElementById('contractorName').value;
+            const existingContact = document.getElementById('existingContact').value;
+            const existingPhone = document.getElementById('existingPhone').value;
+            const existingEmail = document.getElementById('existingEmail').value;
+            const hasDocuments = document.getElementById('hasDocuments').value;
+            const docDate = formatDateDisplay(document.getElementById('docDate').value);
+            const edoAvailable = document.getElementById('edoAvailable').checked;
+            const edoName = document.getElementById('edoName').value;
+            const docCategory = document.getElementById('docCategory').value;
+            const specialConditions = document.getElementById('specialConditions').value;
+            
+            // Функция создания поля
+            const field = (label, value) => ({
+                text: [
+                    { text: label + ' ', bold: true },
+                    { text: value || '—' }
+                ],
+                margin: [0, 2, 0, 2]
+            });
+            
+            // Функция создания заголовка раздела
+            const section = (title) => ({
+                text: title,
+                style: 'sectionHeader',
+                margin: [0, 10, 0, 5]
+            });
+            
+            // Содержимое документа
+            const content = [
+                {
+                    text: 'ЗАЯВКА НА СОГЛАСОВАНИЕ/ИЗМЕНЕНИЕ\nДОГОВОРНЫХ ДОКУМЕНТОВ',
+                    style: 'header',
+                    alignment: 'center',
+                    margin: [0, 0, 0, 20]
+                },
+                field('Номер заявки:', requestNumber),
+                field('Инициатор заявки:', initiator),
+                field('Дата заявки:', date),
+                field('Тип заявки:', requestType),
+                
+                section('ИНФОРМАЦИЯ О ДОКУМЕНТЕ'),
+                field('Вид договорного документа:', docType),
+                field('Наименование документа:', docName),
+                field('Содержание документа:', docContent),
+                
+                section('КОНТРАГЕНТ'),
+                field('Наименование контрагента:', contractorName),
+                field('Контактное лицо:', existingContact),
+                field('Телефон:', existingPhone),
+                field('Email контрагента:', existingEmail),
+                field('Наличие уставных документов:', hasDocuments)
+            ];
+            
+            if (hasDocuments === 'Нет' && docDate) {
+                content.push(field('Дата предоставления документов:', docDate));
+            }
+            
+            content.push(field('Возможность работы с ЭДО:', edoAvailable ? 'Да' : 'Нет'));
+            
+            if (edoAvailable && edoName) {
+                content.push(field('Наименование ЭДО-системы:', edoName));
+            }
+            
+            content.push(field('Тип договорного документа:', docCategory ? 'с ' + docCategory + 'ом' : '—'));
+            
+            // Детали по типу контрагента
+            if (docCategory === 'Подрядчик') {
+                content.push(section('ДЕТАЛИ (ПОДРЯДЧИК)'));
+                content.push(field('Название проекта:', document.getElementById('projectName').value));
+                content.push(field('Адрес объекта:', document.getElementById('objectAddr').value));
+                content.push(field('Вид работ:', document.getElementById('workType').value));
+                content.push(field('Стоимость работ:', document.getElementById('workCost').value));
+                content.push(field('Наличие давальческого материала:', document.getElementById('material').value));
+                content.push(field('Сумма авансового платежа:', document.getElementById('advance').value));
+                content.push(field('Разбивка платежей:', document.getElementById('paymentSchedule').value));
+                content.push(field('Гарантийные удержания:', document.getElementById('guarantee').value));
+                content.push(field('Дата начала работ:', formatDateDisplay(document.getElementById('startDate').value)));
+                content.push(field('Дата окончания работ:', formatDateDisplay(document.getElementById('endDate').value)));
+                content.push(field('Ключевые изменения:', document.getElementById('keyChanges').value));
+            } else if (docCategory === 'Поставщик') {
+                content.push(section('ДЕТАЛИ (ПОСТАВЩИК)'));
+                content.push(field('Название проекта:', document.getElementById('supplierProject').value));
+                content.push(field('Адрес объекта:', document.getElementById('supplierAddr').value));
+                content.push(field('Номенклатура поставки:', document.getElementById('nomenclature').value));
+                content.push(field('Сумма поставки:', document.getElementById('supplyCost').value));
+                content.push(field('Ключевые изменения:', document.getElementById('supplierChanges').value));
+            } else if (docCategory === 'Заказчик') {
+                content.push(section('ДЕТАЛИ (ЗАКАЗЧИК)'));
+                content.push(field('Название проекта:', document.getElementById('customerProject').value));
+                content.push(field('Адрес объекта:', document.getElementById('customerAddr').value));
+                content.push(field('Ключевые изменения:', document.getElementById('customerChanges').value));
+            }
+            
+            if (specialConditions) {
+                content.push(section('ОСОБЫЕ УСЛОВИЯ'));
+                content.push({ text: specialConditions, margin: [0, 2, 0, 2] });
+            }
+            
+            // Определение документа
+            const docDefinition = {
+                content: content,
+                defaultStyle: {
+                    font: 'Roboto',
+                    fontSize: 10
+                },
+                styles: {
+                    header: {
+                        fontSize: 14,
+                        bold: true,
+                        color: '#1f3c88'
+                    },
+                    sectionHeader: {
+                        fontSize: 11,
+                        bold: true,
+                        color: '#1f3c88',
+                        decoration: 'underline'
+                    }
+                },
+                pageSize: 'A4',
+                pageMargins: [40, 40, 40, 40]
+            };
+            
+            // Создаём и скачиваем PDF
+            pdfMake.createPdf(docDefinition).download(fileName);
+        }
+
+        // Показать модальное окно
+        function showModal() {
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        // Закрыть модальное окно
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        // Закрытие модального окна при клике на overlay
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Валидация и отправка формы
+        document.getElementById('documentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            const requiredFields = this.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                const container = field.closest('.conditional');
+                if (container && !container.classList.contains('active')) {
+                    return;
+                }
+                
+                if (!field.value.trim()) {
+                    field.classList.add('field-error');
+                    isValid = false;
+                } else {
+                    field.classList.remove('field-error');
+                }
+            });
+            
+            if (!isValid) {
+                alert('Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+
+            try {
+                // Генерируем PDF документ
+                const requestNumber = document.getElementById('requestNumber').value;
+                const fileName = `Заявка_${requestNumber}.pdf`;
+                
+                await generatePdf(fileName);
+                
+                // Показываем модальное окно
+                showModal();
+                
+            } catch (error) {
+                console.error('Ошибка при генерации документа:', error);
+                alert('Произошла ошибка при создании документа. Пожалуйста, попробуйте ещё раз.');
+            }
+        });
+
+        // Убираем подсветку ошибки при вводе
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+            field.addEventListener('input', function() {
+                this.classList.remove('field-error');
+            });
+        });
+
+        // Установить текущую дату
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Генерация номера заявки
+        function getNextRequestNumber() {
+            let counter = localStorage.getItem('bso_request_counter') || 0;
+            counter = parseInt(counter) + 1;
+            localStorage.setItem('bso_request_counter', counter);
+            return counter;
+        }
+
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = String(date.getFullYear()).slice(-2);
+            return day + month + year;
+        }
+
+        function extractSurname(fullName) {
+            if (!fullName || !fullName.trim()) return '';
+            const parts = fullName.trim().split(/\s+/);
+            return parts[0] || '';
+        }
+
+        function updateRequestNumber() {
+            const initiator = document.getElementById('initiator').value;
+            const surname = extractSurname(initiator);
+            const dateStr = formatDate(new Date());
+            
+            if (surname) {
+                if (!window.currentRequestNumber) {
+                    window.currentRequestNumber = getNextRequestNumber();
+                }
+                const requestNum = `${dateStr}_${surname}_БСО_${window.currentRequestNumber}`;
+                document.getElementById('requestNumber').value = requestNum;
+            } else {
+                document.getElementById('requestNumber').value = '';
+            }
+        }
+
+        updateRequestNumber();
+
+        // Валидация и форматирование телефона
+        document.getElementById('existingPhone').addEventListener('input', function(e) {
+            let value = this.value;
+            
+            if (!value.startsWith('+7')) {
+                value = value.replace(/[^\d]/g, '');
+                if (value.startsWith('7') || value.startsWith('8')) {
+                    value = value.substring(1);
+                }
+                this.value = '+7 ' + value;
+            }
+        });
+
+        document.getElementById('existingPhone').addEventListener('focus', function() {
+            if (!this.value) {
+                this.value = '+7 ';
+            }
+        });
+    </script>
+</body>
+</html>

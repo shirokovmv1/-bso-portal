@@ -37,18 +37,24 @@ const DEFAULT_DATA = {
     applications: [
         {
             id: 1,
+            name: 'Заявка на согласование договора',
+            description: 'Согласование или изменение договорных документов с контрагентами',
+            url: 'forms/Заявка16.html'
+        },
+        {
+            id: 2,
             name: 'Заявка на отпуск',
             description: 'Форма заявления на ежегодный оплачиваемый отпуск',
             url: 'forms/vacation.html'
         },
         {
-            id: 2,
+            id: 3,
             name: 'Заявка на командировку',
             description: 'Оформление командировочных документов для выезда на объекты',
             url: 'forms/business-trip.html'
         },
         {
-            id: 3,
+            id: 4,
             name: 'Заявка на материалы',
             description: 'Запрос строительных материалов и оборудования',
             url: 'forms/materials.html'
