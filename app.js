@@ -2,9 +2,45 @@
    БСО Корпоративный Портал - JavaScript
    Строительная компания БСО (bso-cc.ru)
    Москва, Ленинский пр., д. 11, стр. 2
+   
+   Поддержка:
+   - Серверное хранение (PHP API на Synology)
+   - Локальное хранение (localStorage для тестирования)
    ============================================ */
 
-// Инициализация данных по умолчанию
+// ============================================
+// Конфигурация
+// ============================================
+
+const CONFIG = {
+    // Установите true для работы с сервером Synology
+    useServerStorage: false,
+    
+    // URL API (измените на адрес вашего Synology)
+    apiUrl: '/api',
+    
+    // Ключ для localStorage
+    storageKey: 'bso_portal_data'
+};
+
+// Автоопределение режима работы
+(function detectMode() {
+    // Если есть папка api и мы на сервере - используем API
+    if (window.location.protocol !== 'file:') {
+        fetch(CONFIG.apiUrl + '/news.php', { method: 'HEAD' })
+            .then(response => {
+                if (response.ok) {
+                    CONFIG.useServerStorage = true;
+                    console.log('🌐 Режим: Серверное хранение (Synology)');
+                }
+            })
+            .catch(() => {
+                console.log('💾 Режим: Локальное хранение (localStorage)');
+            });
+    }
+})();
+
+// Данные по умолчанию
 const DEFAULT_DATA = {
     news: [
         {
@@ -120,12 +156,84 @@ const DEFAULT_DATA = {
 };
 
 // ============================================
-// Data Management
+// API Client (для работы с сервером)
+// ============================================
+
+class ApiClient {
+    constructor(baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    async request(endpoint, method = 'GET', data = null) {
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        if (data && method !== 'GET') {
+            options.body = JSON.stringify(data);
+        }
+
+        let url = `${this.baseUrl}/${endpoint}.php`;
+        if (method === 'DELETE' && data?.id) {
+            url += `?id=${data.id}`;
+        }
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error(`API Error: ${endpoint}`, error);
+            throw error;
+        }
+    }
+
+    // News
+    async getNews() { return this.request('news'); }
+    async addNews(data) { return this.request('news', 'POST', data); }
+    async updateNews(data) { return this.request('news', 'PUT', data); }
+    async deleteNews(id) { return this.request('news', 'DELETE', { id }); }
+
+    // Events
+    async getEvents() { return this.request('events'); }
+    async addEvent(data) { return this.request('events', 'POST', data); }
+    async updateEvent(data) { return this.request('events', 'PUT', data); }
+    async deleteEvent(id) { return this.request('events', 'DELETE', { id }); }
+
+    // Applications
+    async getApplications() { return this.request('applications'); }
+    async addApplication(data) { return this.request('applications', 'POST', data); }
+    async updateApplication(data) { return this.request('applications', 'PUT', data); }
+    async deleteApplication(id) { return this.request('applications', 'DELETE', { id }); }
+
+    // Contacts
+    async getContacts() { return this.request('contacts'); }
+    async addContact(data) { return this.request('contacts', 'POST', data); }
+    async updateContact(data) { return this.request('contacts', 'PUT', data); }
+    async deleteContact(id) { return this.request('contacts', 'DELETE', { id }); }
+
+    // FAQ
+    async getFaq() { return this.request('faq'); }
+    async addFaq(data) { return this.request('faq', 'POST', data); }
+    async updateFaq(data) { return this.request('faq', 'PUT', data); }
+    async deleteFaq(id) { return this.request('faq', 'DELETE', { id }); }
+}
+
+const api = new ApiClient(CONFIG.apiUrl);
+
+// ============================================
+// Data Manager (универсальный)
 // ============================================
 
 class DataManager {
     constructor() {
-        this.storageKey = 'bso_portal_data';
+        this.storageKey = CONFIG.storageKey;
+        this.cache = {};
         this.init();
     }
 
@@ -135,175 +243,298 @@ class DataManager {
         }
     }
 
-    getData() {
+    // Локальное хранение
+    getLocalData() {
         const data = localStorage.getItem(this.storageKey);
         return data ? JSON.parse(data) : DEFAULT_DATA;
     }
 
-    saveData(data) {
+    saveLocalData(data) {
         localStorage.setItem(this.storageKey, JSON.stringify(data));
     }
 
+    // =====================
     // News
-    getNews() {
-        return this.getData().news || [];
+    // =====================
+    async getNews() {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.getNews();
+            } catch {
+                return this.getLocalData().news || [];
+            }
+        }
+        return this.getLocalData().news || [];
     }
 
-    addNews(news) {
-        const data = this.getData();
+    async addNews(news) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.addNews(news);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         news.id = Date.now();
         data.news.unshift(news);
-        this.saveData(data);
+        this.saveLocalData(data);
         return news;
     }
 
-    updateNews(id, updatedNews) {
-        const data = this.getData();
+    async updateNews(id, updatedNews) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.updateNews({ id, ...updatedNews });
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         const index = data.news.findIndex(n => n.id === id);
         if (index !== -1) {
             data.news[index] = { ...data.news[index], ...updatedNews };
-            this.saveData(data);
+            this.saveLocalData(data);
         }
     }
 
-    deleteNews(id) {
-        const data = this.getData();
+    async deleteNews(id) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.deleteNews(id);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         data.news = data.news.filter(n => n.id !== id);
-        this.saveData(data);
+        this.saveLocalData(data);
     }
 
+    // =====================
     // Events
-    getEvents() {
-        return this.getData().events || [];
+    // =====================
+    async getEvents() {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.getEvents();
+            } catch {
+                return this.getLocalData().events || [];
+            }
+        }
+        return this.getLocalData().events || [];
     }
 
-    addEvent(event) {
-        const data = this.getData();
+    async addEvent(event) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.addEvent(event);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         event.id = Date.now();
         data.events.unshift(event);
-        this.saveData(data);
+        this.saveLocalData(data);
         return event;
     }
 
-    updateEvent(id, updatedEvent) {
-        const data = this.getData();
+    async updateEvent(id, updatedEvent) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.updateEvent({ id, ...updatedEvent });
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         const index = data.events.findIndex(e => e.id === id);
         if (index !== -1) {
             data.events[index] = { ...data.events[index], ...updatedEvent };
-            this.saveData(data);
+            this.saveLocalData(data);
         }
     }
 
-    deleteEvent(id) {
-        const data = this.getData();
+    async deleteEvent(id) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.deleteEvent(id);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         data.events = data.events.filter(e => e.id !== id);
-        this.saveData(data);
+        this.saveLocalData(data);
     }
 
+    // =====================
     // Applications
-    getApplications() {
-        return this.getData().applications || [];
+    // =====================
+    async getApplications() {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.getApplications();
+            } catch {
+                return this.getLocalData().applications || [];
+            }
+        }
+        return this.getLocalData().applications || [];
     }
 
-    addApplication(app) {
-        const data = this.getData();
+    async addApplication(app) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.addApplication(app);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         app.id = Date.now();
         data.applications.push(app);
-        this.saveData(data);
+        this.saveLocalData(data);
         return app;
     }
 
-    updateApplication(id, updatedApp) {
-        const data = this.getData();
+    async updateApplication(id, updatedApp) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.updateApplication({ id, ...updatedApp });
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         const index = data.applications.findIndex(a => a.id === id);
         if (index !== -1) {
             data.applications[index] = { ...data.applications[index], ...updatedApp };
-            this.saveData(data);
+            this.saveLocalData(data);
         }
     }
 
-    deleteApplication(id) {
-        const data = this.getData();
+    async deleteApplication(id) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.deleteApplication(id);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         data.applications = data.applications.filter(a => a.id !== id);
-        this.saveData(data);
+        this.saveLocalData(data);
     }
 
+    // =====================
     // Contacts
-    getContacts() {
-        return this.getData().contacts || [];
+    // =====================
+    async getContacts() {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.getContacts();
+            } catch {
+                return this.getLocalData().contacts || [];
+            }
+        }
+        return this.getLocalData().contacts || [];
     }
 
-    addContact(contact) {
-        const data = this.getData();
+    async addContact(contact) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.addContact(contact);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         contact.id = Date.now();
         data.contacts.push(contact);
-        this.saveData(data);
+        this.saveLocalData(data);
         return contact;
     }
 
-    updateContact(id, updatedContact) {
-        const data = this.getData();
+    async updateContact(id, updatedContact) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.updateContact({ id, ...updatedContact });
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         const index = data.contacts.findIndex(c => c.id === id);
         if (index !== -1) {
             data.contacts[index] = { ...data.contacts[index], ...updatedContact };
-            this.saveData(data);
+            this.saveLocalData(data);
         }
     }
 
-    deleteContact(id) {
-        const data = this.getData();
+    async deleteContact(id) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.deleteContact(id);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         data.contacts = data.contacts.filter(c => c.id !== id);
-        this.saveData(data);
+        this.saveLocalData(data);
     }
 
+    // =====================
     // FAQ
-    getFaq() {
-        return this.getData().faq || [];
+    // =====================
+    async getFaq() {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.getFaq();
+            } catch {
+                return this.getLocalData().faq || [];
+            }
+        }
+        return this.getLocalData().faq || [];
     }
 
-    addFaq(faq) {
-        const data = this.getData();
+    async addFaq(faq) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.addFaq(faq);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         faq.id = Date.now();
         data.faq.push(faq);
-        this.saveData(data);
+        this.saveLocalData(data);
         return faq;
     }
 
-    updateFaq(id, updatedFaq) {
-        const data = this.getData();
+    async updateFaq(id, updatedFaq) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.updateFaq({ id, ...updatedFaq });
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         const index = data.faq.findIndex(f => f.id === id);
         if (index !== -1) {
             data.faq[index] = { ...data.faq[index], ...updatedFaq };
-            this.saveData(data);
+            this.saveLocalData(data);
         }
     }
 
-    deleteFaq(id) {
-        const data = this.getData();
+    async deleteFaq(id) {
+        if (CONFIG.useServerStorage) {
+            try {
+                return await api.deleteFaq(id);
+            } catch (e) { console.error(e); }
+        }
+        const data = this.getLocalData();
         data.faq = data.faq.filter(f => f.id !== id);
-        this.saveData(data);
+        this.saveLocalData(data);
     }
 
-    // Manuals
+    // =====================
+    // Manuals (только локально)
+    // =====================
     getManuals() {
-        return this.getData().manuals || [];
+        return this.getLocalData().manuals || [];
     }
 
     addManual(manual) {
-        const data = this.getData();
+        const data = this.getLocalData();
         manual.id = Date.now();
         data.manuals.push(manual);
-        this.saveData(data);
+        this.saveLocalData(data);
         return manual;
     }
 
     deleteManual(id) {
-        const data = this.getData();
+        const data = this.getLocalData();
         data.manuals = data.manuals.filter(m => m.id !== id);
-        this.saveData(data);
+        this.saveLocalData(data);
     }
 
-    // Reset to defaults
+    // Reset
     resetToDefaults() {
         localStorage.setItem(this.storageKey, JSON.stringify(DEFAULT_DATA));
     }
@@ -405,11 +636,11 @@ setInterval(updateClock, 60000);
 // ============================================
 
 // Render News List
-function renderNews(containerId = 'news-list') {
+async function renderNews(containerId = 'news-list') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const news = dataManager.getNews();
+    const news = await dataManager.getNews();
     
     if (news.length === 0) {
         container.innerHTML = `
@@ -431,11 +662,11 @@ function renderNews(containerId = 'news-list') {
 }
 
 // Render Events List
-function renderEvents(containerId = 'events-list') {
+async function renderEvents(containerId = 'events-list') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const events = dataManager.getEvents();
+    const events = await dataManager.getEvents();
     
     if (events.length === 0) {
         container.innerHTML = `
@@ -457,11 +688,11 @@ function renderEvents(containerId = 'events-list') {
 }
 
 // Render Applications
-function renderApplications(containerId = 'applications-grid') {
+async function renderApplications(containerId = 'applications-grid') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const applications = dataManager.getApplications();
+    const applications = await dataManager.getApplications();
     
     if (applications.length === 0) {
         container.innerHTML = `
@@ -486,11 +717,11 @@ function renderApplications(containerId = 'applications-grid') {
 }
 
 // Render Contacts Table
-function renderContacts(containerId = 'contacts-table') {
+async function renderContacts(containerId = 'contacts-table') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const contacts = dataManager.getContacts();
+    const contacts = await dataManager.getContacts();
     
     if (contacts.length === 0) {
         container.innerHTML = `
@@ -531,11 +762,11 @@ function renderContacts(containerId = 'contacts-table') {
 }
 
 // Render FAQ
-function renderFaq(containerId = 'faq-list') {
+async function renderFaq(containerId = 'faq-list') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const faq = dataManager.getFaq();
+    const faq = await dataManager.getFaq();
     
     if (faq.length === 0) {
         container.innerHTML = `
@@ -635,11 +866,11 @@ function renderAdminSection(section) {
     }
 }
 
-function renderAdminNews() {
+async function renderAdminNews() {
     const container = document.getElementById('admin-news-list');
     if (!container) return;
 
-    const news = dataManager.getNews();
+    const news = await dataManager.getNews();
     
     container.innerHTML = news.map(item => `
         <div class="item-row" data-id="${item.id}">
@@ -655,11 +886,11 @@ function renderAdminNews() {
     `).join('');
 }
 
-function renderAdminEvents() {
+async function renderAdminEvents() {
     const container = document.getElementById('admin-events-list');
     if (!container) return;
 
-    const events = dataManager.getEvents();
+    const events = await dataManager.getEvents();
     
     container.innerHTML = events.map(item => `
         <div class="item-row" data-id="${item.id}">
@@ -675,11 +906,11 @@ function renderAdminEvents() {
     `).join('');
 }
 
-function renderAdminApplications() {
+async function renderAdminApplications() {
     const container = document.getElementById('admin-applications-list');
     if (!container) return;
 
-    const applications = dataManager.getApplications();
+    const applications = await dataManager.getApplications();
     
     container.innerHTML = applications.map(app => `
         <div class="item-row" data-id="${app.id}">
@@ -695,11 +926,11 @@ function renderAdminApplications() {
     `).join('');
 }
 
-function renderAdminContacts() {
+async function renderAdminContacts() {
     const container = document.getElementById('admin-contacts-list');
     if (!container) return;
 
-    const contacts = dataManager.getContacts();
+    const contacts = await dataManager.getContacts();
     
     container.innerHTML = contacts.map(contact => `
         <div class="item-row" data-id="${contact.id}">
@@ -715,11 +946,11 @@ function renderAdminContacts() {
     `).join('');
 }
 
-function renderAdminFaq() {
+async function renderAdminFaq() {
     const container = document.getElementById('admin-faq-list');
     if (!container) return;
 
-    const faq = dataManager.getFaq();
+    const faq = await dataManager.getFaq();
     
     container.innerHTML = faq.map(item => `
         <div class="item-row" data-id="${item.id}">
@@ -749,8 +980,8 @@ function openAddNewsModal() {
     openModal('news-modal');
 }
 
-function editNews(id) {
-    const news = dataManager.getNews().find(n => n.id === id);
+async function editNews(id) {
+    const news = (await dataManager.getNews()).find(n => n.id === id);
     if (!news) return;
 
     currentEditNewsId = id;
@@ -761,7 +992,7 @@ function editNews(id) {
     openModal('news-modal');
 }
 
-function saveNews() {
+async function saveNews() {
     const title = document.getElementById('news-title').value.trim();
     const date = document.getElementById('news-date').value;
     const text = document.getElementById('news-text').value.trim();
@@ -772,18 +1003,18 @@ function saveNews() {
     }
 
     if (currentEditNewsId) {
-        dataManager.updateNews(currentEditNewsId, { title, date, text });
+        await dataManager.updateNews(currentEditNewsId, { title, date, text });
     } else {
-        dataManager.addNews({ title, date, text });
+        await dataManager.addNews({ title, date, text });
     }
 
     closeModal('news-modal');
     renderAdminNews();
 }
 
-function deleteNews(id) {
+async function deleteNews(id) {
     if (confirm('Удалить эту новость?')) {
-        dataManager.deleteNews(id);
+        await dataManager.deleteNews(id);
         renderAdminNews();
     }
 }
@@ -799,8 +1030,8 @@ function openAddEventModal() {
     openModal('event-modal');
 }
 
-function editEvent(id) {
-    const event = dataManager.getEvents().find(e => e.id === id);
+async function editEvent(id) {
+    const event = (await dataManager.getEvents()).find(e => e.id === id);
     if (!event) return;
 
     currentEditEventId = id;
@@ -811,7 +1042,7 @@ function editEvent(id) {
     openModal('event-modal');
 }
 
-function saveEvent() {
+async function saveEvent() {
     const title = document.getElementById('event-title').value.trim();
     const date = document.getElementById('event-date').value;
     const text = document.getElementById('event-text').value.trim();
@@ -822,18 +1053,18 @@ function saveEvent() {
     }
 
     if (currentEditEventId) {
-        dataManager.updateEvent(currentEditEventId, { title, date, text });
+        await dataManager.updateEvent(currentEditEventId, { title, date, text });
     } else {
-        dataManager.addEvent({ title, date, text });
+        await dataManager.addEvent({ title, date, text });
     }
 
     closeModal('event-modal');
     renderAdminEvents();
 }
 
-function deleteEvent(id) {
+async function deleteEvent(id) {
     if (confirm('Удалить это событие?')) {
-        dataManager.deleteEvent(id);
+        await dataManager.deleteEvent(id);
         renderAdminEvents();
     }
 }
@@ -848,8 +1079,8 @@ function openAddApplicationModal() {
     openModal('application-modal');
 }
 
-function editApplication(id) {
-    const app = dataManager.getApplications().find(a => a.id === id);
+async function editApplication(id) {
+    const app = (await dataManager.getApplications()).find(a => a.id === id);
     if (!app) return;
 
     currentEditAppId = id;
@@ -860,7 +1091,7 @@ function editApplication(id) {
     openModal('application-modal');
 }
 
-function saveApplication() {
+async function saveApplication() {
     const name = document.getElementById('application-name').value.trim();
     const description = document.getElementById('application-desc').value.trim();
     const url = document.getElementById('application-url').value.trim();
@@ -871,18 +1102,18 @@ function saveApplication() {
     }
 
     if (currentEditAppId) {
-        dataManager.updateApplication(currentEditAppId, { name, description, url });
+        await dataManager.updateApplication(currentEditAppId, { name, description, url });
     } else {
-        dataManager.addApplication({ name, description, url });
+        await dataManager.addApplication({ name, description, url });
     }
 
     closeModal('application-modal');
     renderAdminApplications();
 }
 
-function deleteApplication(id) {
+async function deleteApplication(id) {
     if (confirm('Удалить эту заявку?')) {
-        dataManager.deleteApplication(id);
+        await dataManager.deleteApplication(id);
         renderAdminApplications();
     }
 }
@@ -897,8 +1128,8 @@ function openAddContactModal() {
     openModal('contact-modal');
 }
 
-function editContact(id) {
-    const contact = dataManager.getContacts().find(c => c.id === id);
+async function editContact(id) {
+    const contact = (await dataManager.getContacts()).find(c => c.id === id);
     if (!contact) return;
 
     currentEditContactId = id;
@@ -911,7 +1142,7 @@ function editContact(id) {
     openModal('contact-modal');
 }
 
-function saveContact() {
+async function saveContact() {
     const name = document.getElementById('contact-name').value.trim();
     const position = document.getElementById('contact-position').value.trim();
     const department = document.getElementById('contact-department').value.trim();
@@ -924,18 +1155,18 @@ function saveContact() {
     }
 
     if (currentEditContactId) {
-        dataManager.updateContact(currentEditContactId, { name, position, department, phone, email });
+        await dataManager.updateContact(currentEditContactId, { name, position, department, phone, email });
     } else {
-        dataManager.addContact({ name, position, department, phone, email });
+        await dataManager.addContact({ name, position, department, phone, email });
     }
 
     closeModal('contact-modal');
     renderAdminContacts();
 }
 
-function deleteContact(id) {
+async function deleteContact(id) {
     if (confirm('Удалить этот контакт?')) {
-        dataManager.deleteContact(id);
+        await dataManager.deleteContact(id);
         renderAdminContacts();
     }
 }
@@ -950,8 +1181,8 @@ function openAddFaqModal() {
     openModal('faq-modal');
 }
 
-function editFaq(id) {
-    const faq = dataManager.getFaq().find(f => f.id === id);
+async function editFaq(id) {
+    const faq = (await dataManager.getFaq()).find(f => f.id === id);
     if (!faq) return;
 
     currentEditFaqId = id;
@@ -961,7 +1192,7 @@ function editFaq(id) {
     openModal('faq-modal');
 }
 
-function saveFaq() {
+async function saveFaq() {
     const question = document.getElementById('faq-question').value.trim();
     const answer = document.getElementById('faq-answer').value.trim();
 
@@ -971,18 +1202,18 @@ function saveFaq() {
     }
 
     if (currentEditFaqId) {
-        dataManager.updateFaq(currentEditFaqId, { question, answer });
+        await dataManager.updateFaq(currentEditFaqId, { question, answer });
     } else {
-        dataManager.addFaq({ question, answer });
+        await dataManager.addFaq({ question, answer });
     }
 
     closeModal('faq-modal');
     renderAdminFaq();
 }
 
-function deleteFaq(id) {
+async function deleteFaq(id) {
     if (confirm('Удалить этот FAQ?')) {
-        dataManager.deleteFaq(id);
+        await dataManager.deleteFaq(id);
         renderAdminFaq();
     }
 }
