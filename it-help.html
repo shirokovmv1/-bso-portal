@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>БСО Портал — Помощь ИТ</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <div class="logo-icon">🏢</div>
+                    <div>
+                        <div class="logo-text">БСО</div>
+                        <div class="logo-subtitle">Корпоративный портал</div>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Навигация</div>
+                    <a href="index.html" class="nav-item">
+                        <span class="icon">🏠</span>
+                        <span>Главная</span>
+                    </a>
+                    <a href="applications.html" class="nav-item">
+                        <span class="icon">📋</span>
+                        <span>Заявки</span>
+                    </a>
+                    <a href="contacts.html" class="nav-item">
+                        <span class="icon">👥</span>
+                        <span>Контакты</span>
+                    </a>
+                    <a href="it-help.html" class="nav-item active">
+                        <span class="icon">💻</span>
+                        <span>Помощь ИТ</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="admin.html" class="admin-btn">
+                    <span>⚙️</span>
+                    <span>Админ панель</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <h1 class="page-title">
+                    <span class="icon">💻</span>
+                    Помощь ИТ
+                </h1>
+                <div class="header-actions">
+                    <div class="current-time" id="current-time"></div>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Help Desk Form -->
+                <div class="card helpdesk-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <span class="icon">🎫</span>
+                            Заявка в Help Desk
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="helpdesk-form" onsubmit="submitHelpdeskRequest(event)">
+                            <div class="dashboard-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="helpdesk-name">Ваше имя *</label>
+                                    <input type="text" id="helpdesk-name" class="form-input" placeholder="Иванов Иван Иванович" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="helpdesk-email">Email *</label>
+                                    <input type="email" id="helpdesk-email" class="form-input" placeholder="ivanov@company.ru" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="helpdesk-category">Категория проблемы *</label>
+                                <select id="helpdesk-category" class="form-select" required>
+                                    <option value="">Выберите категорию...</option>
+                                    <option value="hardware">Оборудование (ПК, принтер, монитор)</option>
+                                    <option value="software">Программное обеспечение</option>
+                                    <option value="network">Сеть и интернет</option>
+                                    <option value="email">Электронная почта</option>
+                                    <option value="access">Доступ и пароли</option>
+                                    <option value="1c">1С и учётные системы</option>
+                                    <option value="other">Другое</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="helpdesk-description">Описание проблемы *</label>
+                                <textarea id="helpdesk-description" class="form-textarea" placeholder="Опишите вашу проблему подробно..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                📤 Отправить заявку
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-3 dashboard-grid">
+                    <!-- FAQ -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <span class="icon">❓</span>
+                                Частые вопросы (FAQ)
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="faq-list" id="faq-list">
+                                <!-- FAQ will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manuals -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <span class="icon">📚</span>
+                                Инструкции и мануалы
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="applications-grid" id="manuals-list">
+                                <!-- Manuals will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IT Contacts -->
+                <div class="mt-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <span class="icon">📞</span>
+                                Контакты ИТ отдела
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="applications-grid">
+                                <div class="application-card">
+                                    <div class="icon">📧</div>
+                                    <h3>Email</h3>
+                                    <p>Для обращений в IT отдел</p>
+                                    <a href="mailto:it@company.ru">it@company.ru</a>
+                                </div>
+                                <div class="application-card">
+                                    <div class="icon">📱</div>
+                                    <h3>Телефон</h3>
+                                    <p>Для срочных вопросов</p>
+                                    <a href="tel:+79991234569">+7 (999) 123-45-69</a>
+                                </div>
+                                <div class="application-card">
+                                    <div class="icon">🕐</div>
+                                    <h3>Время работы</h3>
+                                    <p>Пн-Пт: 9:00 - 18:00</p>
+                                    <span style="color: var(--text-muted)">Обед: 13:00 - 14:00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
