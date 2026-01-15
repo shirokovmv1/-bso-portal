@@ -534,6 +534,11 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
+.contacts-table td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .contacts-actions {
     white-space: nowrap;
 }
@@ -541,6 +546,11 @@ h1, h2, h3, h4, h5, h6 {
 .contacts-name-header {
     position: relative;
     min-width: 220px;
+}
+
+.contacts-company-header {
+    position: relative;
+    min-width: 160px;
 }
 
 .contacts-search-modal {
@@ -558,6 +568,36 @@ h1, h2, h3, h4, h5, h6 {
     padding: 6px 8px;
     border: 1px solid #cfd3dc;
     border-radius: 4px;
+}
+
+.public-contacts-table th:nth-child(1),
+.public-contacts-table td:nth-child(1) {
+    width: 240px;
+}
+
+.public-contacts-table th:nth-child(2),
+.public-contacts-table td:nth-child(2) {
+    width: 260px;
+}
+
+.public-contacts-table th:nth-child(3),
+.public-contacts-table td:nth-child(3) {
+    width: 160px;
+}
+
+.public-contacts-table th:nth-child(4),
+.public-contacts-table td:nth-child(4) {
+    width: 140px;
+}
+
+.public-contacts-table th:nth-child(5),
+.public-contacts-table td:nth-child(5) {
+    width: 170px;
+}
+
+.public-contacts-table th:nth-child(6),
+.public-contacts-table td:nth-child(6) {
+    width: 200px;
 }
 
 table {

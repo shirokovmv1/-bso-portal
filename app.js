@@ -1983,7 +1983,7 @@ async function renderContacts(containerId = 'contacts-table') {
 
     container.innerHTML = `
         <div class="table-container">
-            <table class="contacts-table">
+            <table class="contacts-table public-contacts-table">
                 <thead>
                     <tr>
                         <th class="contacts-name-header">
@@ -1993,7 +1993,12 @@ async function renderContacts(containerId = 'contacts-table') {
                             </div>
                         </th>
                         <th>Должность</th>
-                        <th>Компания</th>
+                        <th class="contacts-company-header">
+                            Компания
+                            <div class="contacts-search-modal">
+                                <input type="text" id="contacts-company-filter" placeholder="Фильтр по компании">
+                            </div>
+                        </th>
                         <th>Внутренний номер</th>
                         <th>Контактный телефон</th>
                         <th>E-mail</th>
@@ -2015,30 +2020,36 @@ async function renderContacts(containerId = 'contacts-table') {
         </div>
     `;
 
-    setupContactsSearch(contacts);
+    setupContactsFilters(contacts);
 }
 
-function setupContactsSearch(contacts) {
-    const input = document.getElementById('contacts-search');
-    const table = document.querySelector('.contacts-table tbody');
-    if (!input || !table) return;
+function setupContactsFilters(contacts) {
+    const nameInput = document.getElementById('contacts-search');
+    const companyInput = document.getElementById('contacts-company-filter');
+    const table = document.querySelector('.public-contacts-table tbody');
+    if (!nameInput || !companyInput || !table) return;
 
     const rows = Array.from(table.querySelectorAll('tr'));
-    const getName = (row, index) => contacts[index]?.name?.toLowerCase() || '';
+    const getName = (index) => contacts[index]?.name?.toLowerCase() || '';
+    const getCompany = (index) => contacts[index]?.company?.toLowerCase() || '';
 
     const applyFilter = () => {
-        const query = input.value.trim().toLowerCase();
-        if (query.length < 3) {
-            rows.forEach(row => { row.style.display = ''; });
-            return;
-        }
+        const nameQuery = nameInput.value.trim().toLowerCase();
+        const companyQuery = companyInput.value.trim().toLowerCase();
+        const useName = nameQuery.length >= 3;
+        const useCompany = companyQuery.length > 0;
+
         rows.forEach((row, index) => {
-            const name = getName(row, index);
-            row.style.display = name.includes(query) ? '' : 'none';
+            const name = getName(index);
+            const company = getCompany(index);
+            const nameMatch = !useName || name.includes(nameQuery);
+            const companyMatch = !useCompany || company.includes(companyQuery);
+            row.style.display = nameMatch && companyMatch ? '' : 'none';
         });
     };
 
-    input.addEventListener('input', applyFilter);
+    nameInput.addEventListener('input', applyFilter);
+    companyInput.addEventListener('input', applyFilter);
 }
 
 // Render FAQ
