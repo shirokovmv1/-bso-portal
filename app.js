@@ -2282,7 +2282,7 @@ async function renderAdminContacts() {
 
     container.innerHTML = `
         <div class="table-container">
-            <table class="contacts-table">
+            <table class="contacts-table admin-contacts-table">
                 <thead>
                     <tr>
                         <th class="contacts-name-header">
@@ -2292,7 +2292,12 @@ async function renderAdminContacts() {
                             </div>
                         </th>
                         <th>Должность</th>
-                        <th>Компания</th>
+                        <th class="contacts-company-header">
+                            Компания
+                            <div class="contacts-search-modal">
+                                <input type="text" id="admin-contacts-company-filter" placeholder="Фильтр по компании">
+                            </div>
+                        </th>
                         <th>Внутренний номер</th>
                         <th>Дата рождения</th>
                         <th>Контактный телефон</th>
@@ -2325,26 +2330,32 @@ async function renderAdminContacts() {
 }
 
 function setupAdminContactsSearch(contacts) {
-    const input = document.getElementById('admin-contacts-search');
-    const table = document.querySelector('#admin-contacts-list .contacts-table tbody');
-    if (!input || !table) return;
+    const nameInput = document.getElementById('admin-contacts-search');
+    const companyInput = document.getElementById('admin-contacts-company-filter');
+    const table = document.querySelector('#admin-contacts-list .admin-contacts-table tbody');
+    if (!nameInput || !companyInput || !table) return;
 
     const rows = Array.from(table.querySelectorAll('tr'));
-    const getName = (row, index) => contacts[index]?.name?.toLowerCase() || '';
+    const getName = (index) => contacts[index]?.name?.toLowerCase() || '';
+    const getCompany = (index) => contacts[index]?.company?.toLowerCase() || '';
 
     const applyFilter = () => {
-        const query = input.value.trim().toLowerCase();
-        if (query.length < 3) {
-            rows.forEach(row => { row.style.display = ''; });
-            return;
-        }
+        const nameQuery = nameInput.value.trim().toLowerCase();
+        const companyQuery = companyInput.value.trim().toLowerCase();
+        const useName = nameQuery.length >= 3;
+        const useCompany = companyQuery.length > 0;
+
         rows.forEach((row, index) => {
-            const name = getName(row, index);
-            row.style.display = name.includes(query) ? '' : 'none';
+            const name = getName(index);
+            const company = getCompany(index);
+            const nameMatch = !useName || name.includes(nameQuery);
+            const companyMatch = !useCompany || company.includes(companyQuery);
+            row.style.display = nameMatch && companyMatch ? '' : 'none';
         });
     };
 
-    input.addEventListener('input', applyFilter);
+    nameInput.addEventListener('input', applyFilter);
+    companyInput.addEventListener('input', applyFilter);
 }
 
 async function renderAdminFaq() {
