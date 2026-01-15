@@ -1079,6 +1079,15 @@ class DataManager {
         try {
             const parsed = JSON.parse(existing);
             const merged = { ...DEFAULT_DATA, ...parsed };
+
+            const hasLegacyContacts = Array.isArray(parsed.contacts)
+                && parsed.contacts.length > 0
+                && parsed.contacts.every(contact => !('company' in contact) && !('internalNumber' in contact) && !('birthDate' in contact));
+
+            if (hasLegacyContacts) {
+                merged.contacts = DEFAULT_DATA.contacts;
+            }
+
             localStorage.setItem(this.storageKey, JSON.stringify(merged));
         } catch {
             localStorage.setItem(this.storageKey, JSON.stringify(DEFAULT_DATA));
