@@ -102,30 +102,796 @@ const DEFAULT_DATA = {
         }
     ],
     contacts: [
-        {
-            id: 1,
-            name: 'Приёмная',
-            position: 'Общие вопросы',
-            department: 'Руководство',
-            phone: '+7 (495) 147-55-66',
-            email: 'info@bso-cc.ru'
-        },
-        {
-            id: 2,
-            name: 'Отдел проектирования',
-            position: 'Проектная документация',
-            department: 'Проектирование',
-            phone: '+7 (495) 147-55-66',
-            email: 'project@bso-cc.ru'
-        },
-        {
-            id: 3,
-            name: 'IT отдел',
-            position: 'Техническая поддержка',
-            department: 'IT отдел',
-            phone: '+7 (495) 147-55-66',
-            email: 'it@bso-cc.ru'
-        }
+      {
+        "id": 1,
+        "name": "Абрамина Анастасия Юрьевна",
+        "position": "Менеджер проекта",
+        "company": "BSO",
+        "internalNumber": "125",
+        "birthDate": "18 июля",
+        "phone": "8 (999) 917-79-51",
+        "email": "nabramina@bso-cc.ru"
+      },
+      {
+        "id": 2,
+        "name": "Айвазян Филипп Георгиевич",
+        "position": "Инженер ПТО",
+        "company": "BSO",
+        "internalNumber": "201",
+        "birthDate": "17 февраля",
+        "phone": "8 (903) 297-64-75",
+        "email": "aivazyan@bso-cc.ru"
+      },
+      {
+        "id": 3,
+        "name": "Амасев Михаил Анатольевич",
+        "position": "Производитель работ",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "19 ноября",
+        "phone": "8 (917) 525-66-32",
+        "email": "amasev96@mail.ru"
+      },
+      {
+        "id": 4,
+        "name": "Антонова Екатерина Евгеньевна",
+        "position": "Бухгалтер",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "16 мая",
+        "phone": "8 (926) 849-22-98",
+        "email": "eantonova@bso-cc.ru"
+      },
+      {
+        "id": 5,
+        "name": "Антонова Светлана Евгеньевна",
+        "position": "Старший бухгалтер",
+        "company": "BSO",
+        "internalNumber": "129",
+        "birthDate": "8 декабря",
+        "phone": "8 (910) 444-59-47",
+        "email": "santonova@bso-cc.ru"
+      },
+      {
+        "id": 6,
+        "name": "Ашихмин Максим Александрович",
+        "position": "Гл. инженер проекта",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "29 мая",
+        "phone": "8 (916) 244-27-41",
+        "email": "mashikhmin@bso-cc.ru"
+      },
+      {
+        "id": 7,
+        "name": "Ашурян Эмиль Рауфи",
+        "position": "Ведущий юрист",
+        "company": "BSO",
+        "internalNumber": "115",
+        "birthDate": "30 декабря",
+        "phone": "8 (965) 308-01-01",
+        "email": "ashuryan@bso-cc.ru"
+      },
+      {
+        "id": 8,
+        "name": "Башилкина Ольга Александровна",
+        "position": "Ведущий специалист по управлению документами в организации",
+        "company": "BSO",
+        "internalNumber": "142",
+        "birthDate": "3 июля",
+        "phone": "8 (905) 547-59-81",
+        "email": "obashilkina@bso-cc.ru"
+      },
+      {
+        "id": 9,
+        "name": "Бондаренко Антон Валентинович",
+        "position": "Генеральный директор",
+        "company": "BSO",
+        "internalNumber": "100",
+        "birthDate": "5 октября",
+        "phone": "8 (926) 343-03-50",
+        "email": "ab@bso-cc.ru"
+      },
+      {
+        "id": 10,
+        "name": "Вторушина Мария Сергеевна",
+        "position": "Юрист",
+        "company": "BSO",
+        "internalNumber": "126",
+        "birthDate": "8 февраля",
+        "phone": "8 (912) 288-00-77",
+        "email": "mvtorushina@bso-cc.ru"
+      },
+      {
+        "id": 11,
+        "name": "Габдуллина Алина Рафаэлевна",
+        "position": "Ведущий инженер",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "2 декабря",
+        "phone": "8 (917) 379-92-04",
+        "email": "agabdullina@bso-cc.ru"
+      },
+      {
+        "id": 12,
+        "name": "Грибова Любовь Валерьевна",
+        "position": "Бухгалтер",
+        "company": "BSO",
+        "internalNumber": "133",
+        "birthDate": "16 января",
+        "phone": "8 (995) 415-50-36",
+        "email": "lgribova@bso-cc.ru"
+      },
+      {
+        "id": 13,
+        "name": "Демчук Владимир Андреевич",
+        "position": "Менеджер проекта 1 категории",
+        "company": "BSO",
+        "internalNumber": "128",
+        "birthDate": "24 марта",
+        "phone": "8 (915) 122-30-64",
+        "email": "vdemchuk@bso-cc.ru"
+      },
+      {
+        "id": 14,
+        "name": "Дикий Виктор Николаевич",
+        "position": "Производитель работ участка ВК",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "5 апреля",
+        "phone": "8 (903) 730-03-74",
+        "email": "vdikiy@bso-cc.ru"
+      },
+      {
+        "id": 15,
+        "name": "Дубневская Александра Юрьевна",
+        "position": "Финансовый менеджер",
+        "company": "BSO",
+        "internalNumber": "123",
+        "birthDate": "16 декабря",
+        "phone": "8 (991) 225-02-86",
+        "email": "adubnevskaya@bso-cc.ru"
+      },
+      {
+        "id": 16,
+        "name": "Жуйков Максим Владимирович",
+        "position": "Ведущий финансовый менеджер",
+        "company": "BSO",
+        "internalNumber": "122",
+        "birthDate": "22 июля",
+        "phone": "8 (916) 934-78-80",
+        "email": "zhuikov@bso-cc.ru"
+      },
+      {
+        "id": 17,
+        "name": "Зевакина Татьяна Алексеевна",
+        "position": "Ведущий инженер-сметчик",
+        "company": "BSO",
+        "internalNumber": "137",
+        "birthDate": "8 февраля",
+        "phone": "8 (985) 986-36-34",
+        "email": "tzevakina@bso-cc.ru"
+      },
+      {
+        "id": 18,
+        "name": "Иванов Василий Петрович",
+        "position": "Начальник участка",
+        "company": "BSO",
+        "internalNumber": "303",
+        "birthDate": "9 апреля",
+        "phone": "8 (977) 761-40-99",
+        "email": "vivanov@bso-cc.ru"
+      },
+      {
+        "id": 19,
+        "name": "Кантиев Артур Таймуразович",
+        "position": "Начальник участка",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "17 сентября",
+        "phone": "8 (916) 693-38-64",
+        "email": "akantiev@bso-cc.ru"
+      },
+      {
+        "id": 20,
+        "name": "Кириллов Андрей Сергеевич",
+        "position": "Руководитель проекта",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "24 июля",
+        "phone": "8 (921) 388-10-05",
+        "email": "akirillov@bso-cc.ru"
+      },
+      {
+        "id": 21,
+        "name": "Клишейко Игорь Борисович",
+        "position": "Специалист по кадрам",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "12 октября",
+        "phone": "8 (989) 773-57-38",
+        "email": "iklisheyko@bso-cc.ru"
+      },
+      {
+        "id": 22,
+        "name": "Колосов Дмитрий Анатольевич",
+        "position": "Руководитель строительства",
+        "company": "BSO",
+        "internalNumber": "202",
+        "birthDate": "2 марта",
+        "phone": "8 (927) 211-51-82",
+        "email": "dkolosov@bso-cc.ru"
+      },
+      {
+        "id": 23,
+        "name": "Кручинин Михаил Петрович",
+        "position": "Руководитель отдела снабжения",
+        "company": "BSO",
+        "internalNumber": "134",
+        "birthDate": "6 ноября",
+        "phone": "8 (977) 836-88-40",
+        "email": "mkruchinin@bso-cc.ru"
+      },
+      {
+        "id": 24,
+        "name": "Кузнецов Сергей Васильевич",
+        "position": "Руководитель строительства",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "6 августа",
+        "phone": "8 (980) 198-06-27",
+        "email": "skuznetsov@bso-cc.ru"
+      },
+      {
+        "id": 25,
+        "name": "Кузнецов Илья Вадимович",
+        "position": "Руководитель строительства",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "16 июля",
+        "phone": "8 (926) 294-36-42",
+        "email": "ikuznetsov@bso-cc.ru"
+      },
+      {
+        "id": 26,
+        "name": "Кузьмина Лариса Борисовна",
+        "position": "Ведущий бухгалтер",
+        "company": "BSO",
+        "internalNumber": "132",
+        "birthDate": "16 марта",
+        "phone": "8 (916) 021-57-16",
+        "email": "lkuzmina@bso-cc.ru"
+      },
+      {
+        "id": 27,
+        "name": "Летунов Алексей Юрьевич",
+        "position": "Руководитель проекта Раменское 1",
+        "company": "BSO",
+        "internalNumber": "114",
+        "birthDate": "29 марта",
+        "phone": "8 (909) 972-18-19",
+        "email": "ft@bso-cc.ru"
+      },
+      {
+        "id": 28,
+        "name": "Лушникова Ольга Сергеевна",
+        "position": "Специалист по управлению документами организации",
+        "company": "BSO",
+        "internalNumber": "152",
+        "birthDate": "2 июня",
+        "phone": "8 (909) 077-21-81",
+        "email": "olushnikova@bso-cc.ru"
+      },
+      {
+        "id": 29,
+        "name": "Малышев Михаил Андреевич",
+        "position": "Электромонтажник",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "27 июня",
+        "phone": "8 (903)178-99-33",
+        "email": ""
+      },
+      {
+        "id": 30,
+        "name": "Матвеев Роман Борисович",
+        "position": "Руководитель сметного отдела",
+        "company": "BSO",
+        "internalNumber": "137",
+        "birthDate": "4 марта",
+        "phone": "8 (903) 561-57-43",
+        "email": "rmatveev@bso-cc.ru"
+      },
+      {
+        "id": 31,
+        "name": "Мещерякова Наталья Валентиновна",
+        "position": "Зам. главного бухгалтера",
+        "company": "BSO",
+        "internalNumber": "130",
+        "birthDate": "27 мая",
+        "phone": "8 (910) 446-30-36",
+        "email": "mnv@bso-cc.ru"
+      },
+      {
+        "id": 32,
+        "name": "Михайлова Светлана Михайловна",
+        "position": "Техник",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "13 июня",
+        "phone": "8 (905) 766-87-54",
+        "email": "smikhailova@bso-cc.ru"
+      },
+      {
+        "id": 33,
+        "name": "Озеркова Ольга Сергеевна",
+        "position": "Кладовщик",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "3 мая",
+        "phone": "8 (921) 056-76-33",
+        "email": "oozerkova@bso-cc.ru"
+      },
+      {
+        "id": 34,
+        "name": "Осадько Анна Павловна",
+        "position": "Ведущий бухгалтер",
+        "company": "BSO",
+        "internalNumber": "131",
+        "birthDate": "16 октября",
+        "phone": "8 (915) 051-30-94",
+        "email": "buh@bso-cc.ru"
+      },
+      {
+        "id": 35,
+        "name": "Остапенко Дмитрий Васильевич",
+        "position": "Ведущий инженер ПТО",
+        "company": "BSO",
+        "internalNumber": "140",
+        "birthDate": "17 ноября",
+        "phone": "8 (965) 251-02-57",
+        "email": "dostapenko@bso-cc.ru"
+      },
+      {
+        "id": 36,
+        "name": "Пигулевский Геннадий Григорьевич",
+        "position": "Электрик",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "5 марта",
+        "phone": "8 (925) 407-09-29",
+        "email": ""
+      },
+      {
+        "id": 37,
+        "name": "Потапов Эдуард Станиславович",
+        "position": "Руководитель проектов",
+        "company": "BSO",
+        "internalNumber": "127",
+        "birthDate": "27 марта",
+        "phone": "8 (916) 912-41-11",
+        "email": "epotapov@bso-cc.ru"
+      },
+      {
+        "id": 38,
+        "name": "Серая Виктория Валерьевна",
+        "position": "Специалист отдела снабжения",
+        "company": "BSO",
+        "internalNumber": "136",
+        "birthDate": "17 сентября",
+        "phone": "8 (903) 770-72-82",
+        "email": "vkumarina@bso-cc.ru"
+      },
+      {
+        "id": 39,
+        "name": "Соболь Дмитрий Александрович",
+        "position": "Главный инженер-геодезист",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "2 июня",
+        "phone": "8 (910) 597-41-17",
+        "email": "dsobol@bso-cc.ru"
+      },
+      {
+        "id": 40,
+        "name": "Соколов Сергей Владимирович",
+        "position": "Заместитель руководителя проекта",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "3 марта",
+        "phone": "8 (936) 297-55-60",
+        "email": "ssokolov@bso-cc.ru"
+      },
+      {
+        "id": 41,
+        "name": "Суббота Ирина Михайловна",
+        "position": "Заместитель руководителя отдела снабжения",
+        "company": "BSO",
+        "internalNumber": "135",
+        "birthDate": "6 июля",
+        "phone": "8 (926) 205-15-50",
+        "email": "isubbota@bso-cc.ru"
+      },
+      {
+        "id": 42,
+        "name": "Стуленков Сергей Анатольевич",
+        "position": "Руководитель строительства объект Раменское 2",
+        "company": "BSO",
+        "internalNumber": "301",
+        "birthDate": "30 июля",
+        "phone": "8 (916) 588-36-16",
+        "email": "sstulenkov@bso-cc.ru"
+      },
+      {
+        "id": 43,
+        "name": "Сумин Максим Николаевич",
+        "position": "Руководитель проекта Раменское 2",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "24 августа",
+        "phone": "8 (966) 028-83-53",
+        "email": "msumin@bso-cc.ru"
+      },
+      {
+        "id": 44,
+        "name": "Титова Татьяна Николаевна",
+        "position": "Главный бухгалтер",
+        "company": "BSO",
+        "internalNumber": "146",
+        "birthDate": "25 марта",
+        "phone": "8 (926) 230-26-72",
+        "email": "ttitova@bso-cc.ru"
+      },
+      {
+        "id": 45,
+        "name": "Толстопятов Роман Владимирович",
+        "position": "Геодезист Раменское 2",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "27 октября",
+        "phone": "8(902) 562-82-88",
+        "email": ""
+      },
+      {
+        "id": 46,
+        "name": "Ульянов Вадим Борисович",
+        "position": "Заместитель руководителя строительства",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "14 августа",
+        "phone": "8 (905) 306-99-92",
+        "email": "bulyanov@bso-cc.ru"
+      },
+      {
+        "id": 47,
+        "name": "Фатеева Анастасия Владимировна",
+        "position": "Руководитель административного отдела",
+        "company": "BSO",
+        "internalNumber": "113",
+        "birthDate": "29 июля",
+        "phone": "8 (985) 280-90-84",
+        "email": "afateeva@bso-cc.ru"
+      },
+      {
+        "id": 48,
+        "name": "Федорова Татьяна Николаевна",
+        "position": "Офис-менеджер",
+        "company": "BSO",
+        "internalNumber": "118",
+        "birthDate": "14 сентября",
+        "phone": "8 (925) 629-98-14",
+        "email": "tfedorova@bso-cc.ru"
+      },
+      {
+        "id": 49,
+        "name": "Федоров Федор Владимирович",
+        "position": "Производитель работ",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "10 июля",
+        "phone": "8 (951) 999-77-80",
+        "email": ""
+      },
+      {
+        "id": 50,
+        "name": "Финк Вячеслав Николаевич",
+        "position": "Производитель работ",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "9 января",
+        "phone": "8 (915) 015-80-09",
+        "email": ""
+      },
+      {
+        "id": 51,
+        "name": "Харламова Анжелика Руслановна",
+        "position": "Ведущий инженер-сметчик",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "29 апреля",
+        "phone": "8 (903) 155-97-75",
+        "email": "aharlamova@bso-cc.ru"
+      },
+      {
+        "id": 52,
+        "name": "Хлобыстова Анастасия Леонидовна",
+        "position": "Бухгалтер",
+        "company": "BSO",
+        "internalNumber": "139",
+        "birthDate": "19 апреля",
+        "phone": "8 (903) 503-61-70",
+        "email": "akhlobystova@bso-cc.ru"
+      },
+      {
+        "id": 53,
+        "name": "Шанидзе Георгий Зурабович",
+        "position": "Инженер строительного контроля",
+        "company": "BSO",
+        "internalNumber": "",
+        "birthDate": "17 августа",
+        "phone": "8 (915) 075-08-14",
+        "email": "gshanidze@bso-cc.ru"
+      },
+      {
+        "id": 54,
+        "name": "Шибалов Антон Владимирович",
+        "position": "Руководитель проектов",
+        "company": "BSO",
+        "internalNumber": "124",
+        "birthDate": "27 ноября",
+        "phone": "8 (926) 754-80-84",
+        "email": "ashibalov@bso-cc.ru"
+      },
+      {
+        "id": 55,
+        "name": "Широков Михаил Васильевич",
+        "position": "Менеджер отдела сопровождения проектов",
+        "company": "BSO",
+        "internalNumber": "150",
+        "birthDate": "22 ноября",
+        "phone": "8 (964) 780-56-88",
+        "email": "mshirokov@bso-cc.ru"
+      },
+      {
+        "id": 56,
+        "name": "Акимова Наталья Александровна",
+        "position": "Ассистент генерального директора",
+        "company": "ISL",
+        "internalNumber": "112",
+        "birthDate": "28 сентября",
+        "phone": "8 (985) 197-10-00",
+        "email": "n.akimova@isl.pro"
+      },
+      {
+        "id": 57,
+        "name": "Анисимова Наталья Анатольевна",
+        "position": "Главный специалист-архитектор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "28 ноября",
+        "phone": "8 (915) 388-90-98",
+        "email": "n.anisimova@isl.pro"
+      },
+      {
+        "id": 58,
+        "name": "Бурыкин Сергей Анатольевич",
+        "position": "Главный специалист систем ЭОМ",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "4 декабря",
+        "phone": "8 (985) 960-94-37",
+        "email": "s.burykin@isl.pro"
+      },
+      {
+        "id": 59,
+        "name": "Дубинин Владимир Михайлович",
+        "position": "Главный инженер проекта",
+        "company": "ISL",
+        "internalNumber": "117",
+        "birthDate": "3 марта",
+        "phone": "8 (985) 514-94-44",
+        "email": "v.dubinin@isl.pro"
+      },
+      {
+        "id": 60,
+        "name": "Захаров Кирилл Сергеевич",
+        "position": "Инженер конструктор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "15 июля",
+        "phone": "8 (977) 759-72-89",
+        "email": "k.zaharov@isl.pro"
+      },
+      {
+        "id": 61,
+        "name": "Каширцев Сергей Петрович",
+        "position": "Генеральный Директор",
+        "company": "ISL",
+        "internalNumber": "111",
+        "birthDate": "24 марта",
+        "phone": "8 (926) 364-44-67",
+        "email": "Sk@isl.pro"
+      },
+      {
+        "id": 62,
+        "name": "Кашуба Анастасия Вячеславовна",
+        "position": "Инженер конструктор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "20 мая",
+        "phone": "8 (951) 155-93-21",
+        "email": "a.kashuba@isl.pro"
+      },
+      {
+        "id": 63,
+        "name": "Козлов Михаил Дмитриевич",
+        "position": "Архитектор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "14 марта",
+        "phone": "8 (985) 957-02-45",
+        "email": "m.kozlov@isl.pro"
+      },
+      {
+        "id": 64,
+        "name": "Крамаренко Андрей Сергеевич",
+        "position": "Главный инженер проекта",
+        "company": "ISL",
+        "internalNumber": "145",
+        "birthDate": "13 ноября",
+        "phone": "8 (995) 299-64-80",
+        "email": "a.kramarenko@isl.pro"
+      },
+      {
+        "id": 65,
+        "name": "Кулагин Алексей Игоревич",
+        "position": "Ведущий инженер-конструктор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "28 октября",
+        "phone": "8 (901) 597-10-22",
+        "email": "a.kulagin@isl.pro"
+      },
+      {
+        "id": 66,
+        "name": "Леверьев Михаил Аркадьевич",
+        "position": "Главный инженер проекта",
+        "company": "ISL",
+        "internalNumber": "119",
+        "birthDate": "26 октября",
+        "phone": "8 (999)-189-07-80",
+        "email": "m.leverev@isl.pro"
+      },
+      {
+        "id": 67,
+        "name": "Ломакин Руслан Станиславович",
+        "position": "Ведущий инженер-конструктор",
+        "company": "ISL",
+        "internalNumber": "149",
+        "birthDate": "17 августа",
+        "phone": "8 (928) 573-01-66",
+        "email": "r.lomakin@isl.pro"
+      },
+      {
+        "id": 68,
+        "name": "Матюха Максим Викторович",
+        "position": "Инженер инструктор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "12 мая",
+        "phone": "8 (999) 458-32-87",
+        "email": "m.matyukha@isl.pro"
+      },
+      {
+        "id": 69,
+        "name": "Мотекайтис Владислав Викторович",
+        "position": "Главный конструктор",
+        "company": "ISL",
+        "internalNumber": "116",
+        "birthDate": "19 февраля",
+        "phone": "8 (921) 988-87-76",
+        "email": "v.motekaitis@isl.pro"
+      },
+      {
+        "id": 70,
+        "name": "Никитский Виктор Андреевич",
+        "position": "Главный инженер проекта",
+        "company": "ISL",
+        "internalNumber": "147",
+        "birthDate": "25 марта",
+        "phone": "8 (905) 506-02-09",
+        "email": "v.nikitskij@isl.pro"
+      },
+      {
+        "id": 71,
+        "name": "Родина Наталья Николаевна",
+        "position": "Инженер-проектировщик",
+        "company": "ISL",
+        "internalNumber": "148",
+        "birthDate": "29 октября",
+        "phone": "8 (928) 135-91-25",
+        "email": "n.rodina@isl.pro"
+      },
+      {
+        "id": 72,
+        "name": "Селивёрстова Наталья Андреевна",
+        "position": "Главный специалист генерального плана",
+        "company": "ISL",
+        "internalNumber": "121",
+        "birthDate": "13 июня",
+        "phone": "8 (926) 232-47-59",
+        "email": "n.seliverstova@isl.pro"
+      },
+      {
+        "id": 73,
+        "name": "Семухина Юлия Сергеевна",
+        "position": "Главный бухгалтер",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "26 апреля",
+        "phone": "8 (926) 016-82-55",
+        "email": "y.semuhina@isl.pro"
+      },
+      {
+        "id": 74,
+        "name": "Сибагатова Анастасия Александровна",
+        "position": "Архитектор первой категории",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "27 января",
+        "phone": "8 (901) 508-60-26",
+        "email": "a.kondrateva@isl.pro"
+      },
+      {
+        "id": 75,
+        "name": "Степанова Екатерина Владимировна",
+        "position": "Инженер конструктор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "2 июля",
+        "phone": "8 (960) 782-10-04",
+        "email": "e.stepanova@isl.pro"
+      },
+      {
+        "id": 76,
+        "name": "Таркан Екатерина Сергеевна",
+        "position": "Главный архитектор проекта",
+        "company": "ISL",
+        "internalNumber": "120",
+        "birthDate": "13 января",
+        "phone": "8 (950) 018-83-54",
+        "email": "e.tarkan@isl.pro"
+      },
+      {
+        "id": 77,
+        "name": "Трапезникова Анастасия Геннадьевна",
+        "position": "Инженер конструктор",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "25 марта",
+        "phone": "8 (903) 886-58-89",
+        "email": "a.trapeznikova@isl.pro"
+      },
+      {
+        "id": 78,
+        "name": "Ширяев Дмитрий Сергеевич",
+        "position": "Водитель",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "11 апреля",
+        "phone": "8 (915) 185-54-14",
+        "email": ""
+      },
+      {
+        "id": 79,
+        "name": "Ядыкова Ангелина Александровна",
+        "position": "Ведущий инженер конструктор-руководитель группы",
+        "company": "ISL",
+        "internalNumber": "",
+        "birthDate": "28 ноября",
+        "phone": "8 (901) 740-65-09",
+        "email": "a.yadykova@isl.pro"
+      }
     ],
     faq: [
         {
@@ -806,6 +1572,109 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function parseBirthDate(birthDate) {
+    if (!birthDate) return null;
+    const match = birthDate.trim().match(/^(\d{1,2})\s+([а-яё]+)/i);
+    if (!match) return null;
+    const day = parseInt(match[1], 10);
+    const monthName = match[2].toLowerCase();
+    const months = {
+        'января': 0,
+        'февраля': 1,
+        'марта': 2,
+        'апреля': 3,
+        'мая': 4,
+        'июня': 5,
+        'июля': 6,
+        'августа': 7,
+        'сентября': 8,
+        'октября': 9,
+        'ноября': 10,
+        'декабря': 11
+    };
+    if (!Number.isFinite(day) || day < 1 || day > 31) return null;
+    if (months[monthName] === undefined) return null;
+    return { day, month: months[monthName] };
+}
+
+function declineWordGenitive(word) {
+    const lower = word.toLowerCase();
+    const map = {
+        'директор': 'директора',
+        'менеджер': 'менеджера',
+        'инженер': 'инженера',
+        'бухгалтер': 'бухгалтера',
+        'юрист': 'юриста',
+        'начальник': 'начальника',
+        'руководитель': 'руководителя',
+        'специалист': 'специалиста',
+        'ведущий': 'ведущего',
+        'главный': 'главного',
+        'заместитель': 'заместителя',
+        'офис-менеджер': 'офис-менеджера'
+    };
+    if (map[lower]) return map[lower];
+    if (lower.endsWith('тель')) return lower + 'я';
+    if (lower.endsWith('ник')) return lower + 'а';
+    if (lower.endsWith('щик') || lower.endsWith('чик')) return lower + 'а';
+    if (lower.endsWith('ист')) return lower + 'а';
+    if (lower.endsWith('ер')) return lower + 'а';
+    if (lower.endsWith('ор')) return lower + 'а';
+    if (lower.endsWith('ый') || lower.endsWith('ий') || lower.endsWith('ой')) {
+        return lower.slice(0, -2) + 'ого';
+    }
+    if (lower.endsWith('ая')) return lower.slice(0, -2) + 'ой';
+    if (lower.endsWith('яя')) return lower.slice(0, -2) + 'ей';
+    if (lower.endsWith('а')) return lower.slice(0, -1) + 'ы';
+    if (lower.endsWith('я')) return lower.slice(0, -1) + 'и';
+    return lower;
+}
+
+function declinePositionGenitive(position) {
+    if (!position) return '';
+    return position
+        .split(/\s+/)
+        .map(part => part.split('-').map(declineWordGenitive).join('-'))
+        .join(' ');
+}
+
+function declineNameAccusative(name) {
+    if (!name) return '';
+    const words = name.trim().split(/\s+/);
+    return words.map(word => {
+        const lower = word.toLowerCase();
+        if (lower.endsWith('а')) return word.slice(0, -1) + 'у';
+        if (lower.endsWith('я')) return word.slice(0, -1) + 'ю';
+        if (lower.endsWith('ий')) return word.slice(0, -2) + 'ия';
+        if (lower.endsWith('й')) return word.slice(0, -1) + 'я';
+        const consonant = /[бвгджзклмнпрстфхцчшщ]$/i;
+        if (consonant.test(lower)) return word + 'а';
+        return word;
+    }).join(' ');
+}
+
+function getBirthdayEvents(contacts) {
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth();
+    const todayIso = today.toISOString().split('T')[0];
+
+    return contacts
+        .map(contact => {
+            const parsed = parseBirthDate(contact.birthDate);
+            if (!parsed || parsed.day !== day || parsed.month !== month) return null;
+            const position = declinePositionGenitive(contact.position);
+            const name = declineNameAccusative(contact.name);
+            return {
+                id: `birthday-${contact.id}`,
+                date: todayIso,
+                title: `Поздравляем с Днем Рождения, ${position} ${name}`.trim(),
+                text: ''
+            };
+        })
+        .filter(Boolean);
+}
+
 function getAuthToken() {
     try {
         const raw = localStorage.getItem('bso_admin_auth');
@@ -1032,8 +1901,10 @@ async function renderEvents(containerId = 'events-list') {
     if (!container) return;
 
     const events = await dataManager.getEvents();
+    const birthdayEvents = getBirthdayEvents(await dataManager.getContacts());
+    const mergedEvents = [...birthdayEvents, ...events];
     
-    if (events.length === 0) {
+    if (mergedEvents.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="icon">📅</div>
@@ -1043,7 +1914,7 @@ async function renderEvents(containerId = 'events-list') {
         return;
     }
 
-    container.innerHTML = events.map(item => `
+    container.innerHTML = mergedEvents.map(item => `
         <div class="event-item" data-id="${item.id}">
             <div class="event-date">📅 ${formatDate(item.date)}</div>
             <div class="event-title">${escapeHtml(item.title)}</div>
@@ -1108,7 +1979,8 @@ async function renderContacts(containerId = 'contacts-table') {
                     <tr>
                         <th>ФИО</th>
                         <th>Должность</th>
-                        <th>Отдел</th>
+                        <th>Компания</th>
+                        <th>Внутренний номер</th>
                         <th>Телефон</th>
                         <th>Email</th>
                     </tr>
@@ -1118,7 +1990,8 @@ async function renderContacts(containerId = 'contacts-table') {
                         <tr data-id="${contact.id}">
                             <td><strong>${escapeHtml(contact.name)}</strong></td>
                             <td>${escapeHtml(contact.position)}</td>
-                            <td>${escapeHtml(contact.department)}</td>
+                            <td>${escapeHtml(contact.company || '')}</td>
+                            <td>${escapeHtml(contact.internalNumber || '')}</td>
                             <td>${escapeHtml(contact.phone)}</td>
                             <td><a href="mailto:${escapeHtml(contact.email)}">${escapeHtml(contact.email)}</a></td>
                         </tr>
@@ -1361,7 +2234,7 @@ async function renderAdminContacts() {
         <div class="item-row" data-id="${contact.id}">
             <div class="item-info">
                 <div class="item-title">${escapeHtml(contact.name)}</div>
-                <div class="item-meta">${escapeHtml(contact.position)} — ${escapeHtml(contact.department)}</div>
+                <div class="item-meta">${escapeHtml(contact.position)} — ${escapeHtml(contact.company || '')} ${escapeHtml(contact.internalNumber || '')}</div>
             </div>
             <div class="item-actions">
                 <button class="btn btn-secondary btn-sm" onclick="editContact(${contact.id})">✏️</button>
@@ -1651,7 +2524,9 @@ async function editContact(id) {
     currentEditContactId = id;
     document.getElementById('contact-name').value = contact.name;
     document.getElementById('contact-position').value = contact.position;
-    document.getElementById('contact-department').value = contact.department;
+    document.getElementById('contact-company').value = contact.company || '';
+    document.getElementById('contact-internal-number').value = contact.internalNumber || '';
+    document.getElementById('contact-birth-date').value = contact.birthDate || '';
     document.getElementById('contact-phone').value = contact.phone;
     document.getElementById('contact-email').value = contact.email;
     document.getElementById('contact-modal-title').textContent = 'Редактировать контакт';
@@ -1662,7 +2537,9 @@ async function editContact(id) {
 async function saveContact() {
     const name = document.getElementById('contact-name').value.trim();
     const position = document.getElementById('contact-position').value.trim();
-    const department = document.getElementById('contact-department').value.trim();
+    const company = document.getElementById('contact-company').value.trim();
+    const internalNumber = document.getElementById('contact-internal-number').value.trim();
+    const birthDate = document.getElementById('contact-birth-date').value.trim();
     const phone = document.getElementById('contact-phone').value.trim();
     const email = document.getElementById('contact-email').value.trim();
 
@@ -1676,9 +2553,9 @@ async function saveContact() {
     }
 
     if (currentEditContactId) {
-        await dataManager.updateContact(currentEditContactId, { name, position, department, phone, email });
+        await dataManager.updateContact(currentEditContactId, { name, position, company, internalNumber, birthDate, phone, email });
     } else {
-        await dataManager.addContact({ name, position, department, phone, email });
+        await dataManager.addContact({ name, position, company, internalNumber, birthDate, phone, email });
     }
 
     closeModal('contact-modal');
@@ -1727,7 +2604,9 @@ async function handleContactsImport(event) {
             continue;
         }
         const position = (columns[2] || '').trim();
-        const department = (columns[3] || '').trim();
+        const company = (columns[3] || '').trim();
+        const internalNumber = (columns[4] || '').trim();
+        const birthDate = (columns[5] || '').trim();
         const phone = (columns[6] || '').trim();
         let email = (columns[7] || '').trim();
         if (email === '-' || email === '—') {
@@ -1737,7 +2616,9 @@ async function handleContactsImport(event) {
             id: Date.now() + (i - startIndex),
             name,
             position,
-            department,
+            company,
+            internalNumber,
+            birthDate,
             phone,
             email
         });
@@ -1776,9 +2657,9 @@ async function exportContactsCsv() {
             index + 1,
             csvEscape(contact.name),
             csvEscape(contact.position),
-            csvEscape(contact.department),
-            '',
-            '',
+            csvEscape(contact.company || ''),
+            csvEscape(contact.internalNumber || ''),
+            csvEscape(contact.birthDate || ''),
             csvEscape(contact.phone),
             csvEscape(contact.email)
         ].join(';'));
