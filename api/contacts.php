@@ -14,7 +14,9 @@ switch ($method) {
                     'id' => 1,
                     'name' => 'Приёмная',
                     'position' => 'Общие вопросы',
-                    'department' => 'Руководство',
+                    'company' => 'БСО',
+                    'internalNumber' => '',
+                    'birthDate' => '',
                     'phone' => '+7 (495) 147-55-66',
                     'email' => 'info@bso-cc.ru'
                 ],
@@ -22,7 +24,9 @@ switch ($method) {
                     'id' => 2,
                     'name' => 'Отдел проектирования',
                     'position' => 'Проектная документация',
-                    'department' => 'Проектирование',
+                    'company' => 'БСО',
+                    'internalNumber' => '',
+                    'birthDate' => '',
                     'phone' => '+7 (495) 147-55-66',
                     'email' => 'project@bso-cc.ru'
                 ],
@@ -30,24 +34,41 @@ switch ($method) {
                     'id' => 3,
                     'name' => 'IT отдел',
                     'position' => 'Техническая поддержка',
-                    'department' => 'IT отдел',
+                    'company' => 'БСО',
+                    'internalNumber' => '',
+                    'birthDate' => '',
                     'phone' => '+7 (495) 147-55-66',
                     'email' => 'it@bso-cc.ru'
                 ]
             ];
             writeData('contacts', $contacts);
         }
+        $contacts = array_map(function ($item) {
+            return [
+                'id' => $item['id'] ?? round(microtime(true) * 1000),
+                'name' => $item['name'] ?? '',
+                'position' => $item['position'] ?? '',
+                'company' => $item['company'] ?? ($item['department'] ?? ''),
+                'internalNumber' => $item['internalNumber'] ?? '',
+                'birthDate' => $item['birthDate'] ?? '',
+                'phone' => $item['phone'] ?? '',
+                'email' => $item['email'] ?? ''
+            ];
+        }, $contacts);
         respond($contacts);
         break;
         
     case 'POST':
         requireAuth();
         $contacts = readData('contacts');
+        $incomingId = $data['id'] ?? null;
         $newItem = [
-            'id' => time(),
+            'id' => is_numeric($incomingId) ? (int)$incomingId : round(microtime(true) * 1000),
             'name' => $data['name'] ?? '',
             'position' => $data['position'] ?? '',
-            'department' => $data['department'] ?? '',
+            'company' => $data['company'] ?? '',
+            'internalNumber' => $data['internalNumber'] ?? '',
+            'birthDate' => $data['birthDate'] ?? '',
             'phone' => $data['phone'] ?? '',
             'email' => $data['email'] ?? ''
         ];
@@ -64,7 +85,9 @@ switch ($method) {
             if ($item['id'] == $data['id']) {
                 $item['name'] = $data['name'] ?? $item['name'];
                 $item['position'] = $data['position'] ?? $item['position'];
-                $item['department'] = $data['department'] ?? $item['department'];
+                $item['company'] = $data['company'] ?? ($item['company'] ?? '');
+                $item['internalNumber'] = $data['internalNumber'] ?? ($item['internalNumber'] ?? '');
+                $item['birthDate'] = $data['birthDate'] ?? ($item['birthDate'] ?? '');
                 $item['phone'] = $data['phone'] ?? $item['phone'];
                 $item['email'] = $data['email'] ?? $item['email'];
                 writeData('contacts', $contacts);
