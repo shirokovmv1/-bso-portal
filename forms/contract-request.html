@@ -22,6 +22,10 @@
         .conditional { display: none; margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 5px; }
         .conditional.active { display: block; }
         button { background: #1f3c88; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 20px; transition: background 0.3s; }
+        .button-group { display: flex; gap: 12px; margin-top: 20px; }
+        .button-group button { width: 100%; margin-top: 0; }
+        .btn-secondary { background: #6b7280; }
+        .btn-secondary:hover { background: #4b5563; }
         button:hover { background: #153f6e; }
         .error-message { color: #d32f2f; font-size: 14px; margin-top: 5px; display: none; }
         .field-error { border-color: #d32f2f !important; }
@@ -117,6 +121,12 @@
             <div class="section">
                 <label for="initiator">Инициатор заявки (ФИО) <span class="required">*</span></label>
                 <input type="text" id="initiator" name="Инициатор заявки" required minlength="2" maxlength="100" oninput="updateRequestNumber()">
+            </div>
+
+            <!-- 2.1 Email инициатора -->
+            <div class="section">
+                <label for="initiatorEmail">Email инициатора</label>
+                <input type="email" id="initiatorEmail" name="Email инициатора" placeholder="example@company.ru">
             </div>
 
             <!-- 3. Дата заявки -->
@@ -277,7 +287,10 @@
                 <textarea id="specialConditions" name="Особые условия" maxlength="500"></textarea>
             </div>
 
-            <button type="submit">Сформировать заявку</button>
+            <div class="button-group">
+                <button type="submit">Сформировать заявку</button>
+                <button type="button" class="btn-secondary" id="send-email-btn">Отправить на E-mail</button>
+            </div>
         </form>
 
         <div class="instruction" style="margin-top: 20px;">
@@ -393,6 +406,8 @@
             const requestNumber = document.getElementById('requestNumber').value;
             const initiator = document.getElementById('initiator').value;
             const date = formatDateDisplay(document.getElementById('date').value);
+            const initiatorEmail = document.getElementById('initiatorEmail').value;
+            const initiatorEmail = document.getElementById('initiatorEmail').value;
             const requestType = document.getElementById('requestType').value;
             const docType = document.getElementById('docType').value;
             const docName = document.getElementById('docName').value;
@@ -417,6 +432,7 @@
                     <p><strong>Номер заявки:</strong> ${requestNumber || '—'}</p>
                     <p><strong>Инициатор заявки:</strong> ${initiator || '—'}</p>
                     <p><strong>Дата заявки:</strong> ${date || '—'}</p>
+                    <p><strong>Email инициатора:</strong> ${initiatorEmail || '—'}</p>
                     <p><strong>Тип заявки:</strong> ${requestType || '—'}</p>
                     
                     <h2 style="color: #1f3c88; font-size: 14px; margin-top: 20px; border-bottom: 1px solid #1f3c88; padding-bottom: 5px;">
@@ -551,6 +567,7 @@
                 field('Номер заявки:', requestNumber),
                 field('Инициатор заявки:', initiator),
                 field('Дата заявки:', date),
+                field('Email инициатора:', initiatorEmail),
                 field('Тип заявки:', requestType),
                 
                 section('ИНФОРМАЦИЯ О ДОКУМЕНТЕ'),
@@ -639,6 +656,145 @@
             pdfMake.createPdf(docDefinition).download(fileName);
         }
 
+        function generatePdfBlob(fileName) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const requestNumber = document.getElementById('requestNumber').value;
+                    const initiator = document.getElementById('initiator').value;
+                    const date = formatDateDisplay(document.getElementById('date').value);
+                    const initiatorEmail = document.getElementById('initiatorEmail').value;
+                    const requestType = document.getElementById('requestType').value;
+                    const docType = document.getElementById('docType').value;
+                    const docName = document.getElementById('docName').value;
+                    const docContent = document.getElementById('docContent').value;
+                    const contractorName = document.getElementById('contractorName').value;
+                    const existingContact = document.getElementById('existingContact').value;
+                    const existingPhone = document.getElementById('existingPhone').value;
+                    const existingEmail = document.getElementById('existingEmail').value;
+                    const hasDocuments = document.getElementById('hasDocuments').value;
+                    const docDate = formatDateDisplay(document.getElementById('docDate').value);
+                    const edoAvailable = document.getElementById('edoAvailable').checked;
+                    const edoName = document.getElementById('edoName').value;
+                    const docCategory = document.getElementById('docCategory').value;
+                    const specialConditions = document.getElementById('specialConditions').value;
+
+                    const field = (label, value) => ({
+                        text: [
+                            { text: label + ' ', bold: true },
+                            { text: value || '—' }
+                        ],
+                        margin: [0, 2, 0, 2]
+                    });
+
+                    const section = (title) => ({
+                        text: title,
+                        style: 'sectionHeader',
+                        margin: [0, 10, 0, 5]
+                    });
+
+                    const content = [
+                        {
+                            text: 'ЗАЯВКА НА СОГЛАСОВАНИЕ/ИЗМЕНЕНИЕ\nДОГОВОРНЫХ ДОКУМЕНТОВ',
+                            style: 'header',
+                            alignment: 'center',
+                            margin: [0, 0, 0, 20]
+                        },
+                        field('Номер заявки:', requestNumber),
+                        field('Инициатор заявки:', initiator),
+                        field('Дата заявки:', date),
+                        field('Email инициатора:', initiatorEmail),
+                        field('Тип заявки:', requestType),
+                        
+                        section('ИНФОРМАЦИЯ О ДОКУМЕНТЕ'),
+                        field('Вид договорного документа:', docType),
+                        field('Наименование документа:', docName),
+                        field('Содержание документа:', docContent),
+                        
+                        section('КОНТРАГЕНТ'),
+                        field('Наименование контрагента:', contractorName),
+                        field('Контактное лицо:', existingContact),
+                        field('Телефон:', existingPhone),
+                        field('Email контрагента:', existingEmail),
+                        field('Наличие уставных документов:', hasDocuments)
+                    ];
+
+                    if (hasDocuments === 'Нет' && docDate) {
+                        content.push(field('Дата предоставления документов:', docDate));
+                    }
+
+                    content.push(field('Возможность работы с ЭДО:', edoAvailable ? 'Да' : 'Нет'));
+
+                    if (edoAvailable && edoName) {
+                        content.push(field('Наименование ЭДО-системы:', edoName));
+                    }
+
+                    content.push(field('Тип договорного документа:', docCategory ? 'с ' + docCategory + 'ом' : '—'));
+
+                    if (docCategory === 'Подрядчик') {
+                        content.push(section('ДЕТАЛИ (ПОДРЯДЧИК)'));
+                        content.push(field('Название проекта:', document.getElementById('projectName').value));
+                        content.push(field('Адрес объекта:', document.getElementById('objectAddr').value));
+                        content.push(field('Вид работ:', document.getElementById('workType').value));
+                        content.push(field('Стоимость работ:', document.getElementById('workCost').value));
+                        content.push(field('Наличие давальческого материала:', document.getElementById('material').value));
+                        content.push(field('Сумма авансового платежа:', document.getElementById('advance').value));
+                        content.push(field('Разбивка платежей:', document.getElementById('paymentSchedule').value));
+                        content.push(field('Гарантийные удержания:', document.getElementById('guarantee').value));
+                        content.push(field('Дата начала работ:', formatDateDisplay(document.getElementById('startDate').value)));
+                        content.push(field('Дата окончания работ:', formatDateDisplay(document.getElementById('endDate').value)));
+                        content.push(field('Ключевые изменения:', document.getElementById('keyChanges').value));
+                    } else if (docCategory === 'Поставщик') {
+                        content.push(section('ДЕТАЛИ (ПОСТАВЩИК)'));
+                        content.push(field('Название проекта:', document.getElementById('supplierProject').value));
+                        content.push(field('Адрес объекта:', document.getElementById('supplierAddr').value));
+                        content.push(field('Номенклатура поставки:', document.getElementById('nomenclature').value));
+                        content.push(field('Сумма поставки:', document.getElementById('supplyCost').value));
+                        content.push(field('Ключевые изменения:', document.getElementById('supplierChanges').value));
+                    } else if (docCategory === 'Заказчик') {
+                        content.push(section('ДЕТАЛИ (ЗАКАЗЧИК)'));
+                        content.push(field('Название проекта:', document.getElementById('customerProject').value));
+                        content.push(field('Адрес объекта:', document.getElementById('customerAddr').value));
+                        content.push(field('Ключевые изменения:', document.getElementById('customerChanges').value));
+                    }
+
+                    if (specialConditions) {
+                        content.push(section('ОСОБЫЕ УСЛОВИЯ'));
+                        content.push({ text: specialConditions, margin: [0, 2, 0, 2] });
+                    }
+
+                    const docDefinition = {
+                        content: content,
+                        defaultStyle: {
+                            font: 'Roboto',
+                            fontSize: 10
+                        },
+                        styles: {
+                            header: {
+                                fontSize: 14,
+                                bold: true,
+                                color: '#1f3c88'
+                            },
+                            sectionHeader: {
+                                fontSize: 11,
+                                bold: true,
+                                color: '#1f3c88',
+                                decoration: 'underline'
+                            }
+                        },
+                        pageSize: 'A4',
+                        pageMargins: [40, 40, 40, 40]
+                    };
+
+                    pdfMake.createPdf(docDefinition).getBlob(blob => {
+                        blob.name = fileName;
+                        resolve(blob);
+                    });
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        }
+
         // Показать модальное окно
         function showModal() {
             document.getElementById('successModal').classList.add('active');
@@ -656,13 +812,16 @@
             }
         });
 
-        // Валидация и отправка формы
-        document.getElementById('documentForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
+        function isValidEmail(email) {
+            if (!email) return true;
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validateForm({ requireEmail = false } = {}) {
             let isValid = true;
-            const requiredFields = this.querySelectorAll('[required]');
-            
+            const requiredFields = document.querySelectorAll('#documentForm [required]');
+            const initiatorEmailField = document.getElementById('initiatorEmail');
+
             requiredFields.forEach(field => {
                 const container = field.closest('.conditional');
                 if (container && !container.classList.contains('active')) {
@@ -676,25 +835,70 @@
                     field.classList.remove('field-error');
                 }
             });
-            
-            if (!isValid) {
+
+            if (requireEmail && !initiatorEmailField.value.trim()) {
+                initiatorEmailField.classList.add('field-error');
+                isValid = false;
+            } else if (!isValidEmail(initiatorEmailField.value.trim())) {
+                initiatorEmailField.classList.add('field-error');
+                isValid = false;
+            } else {
+                initiatorEmailField.classList.remove('field-error');
+            }
+
+            return isValid;
+        }
+
+        // Валидация и отправка формы (скачивание PDF)
+        document.getElementById('documentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
                 alert('Пожалуйста, заполните все обязательные поля');
                 return;
             }
 
             try {
-                // Генерируем PDF документ
                 const requestNumber = document.getElementById('requestNumber').value;
                 const fileName = `Заявка_${requestNumber}.pdf`;
-                
+
                 await generatePdf(fileName);
-                
-                // Показываем модальное окно
                 showModal();
-                
             } catch (error) {
                 console.error('Ошибка при генерации документа:', error);
                 alert('Произошла ошибка при создании документа. Пожалуйста, попробуйте ещё раз.');
+            }
+        });
+
+        async function sendEmailRequest({ to, subject, fileBlob }) {
+            // TODO: заменить на серверную отправку с noreply@bco-cc.ru
+            console.log('Email send placeholder', { to, subject, fileBlob });
+            alert('Отправка на email будет доступна после настройки серверной отправки.');
+        }
+
+        // Отправка на email
+        document.getElementById('send-email-btn').addEventListener('click', async function() {
+            if (!validateForm({ requireEmail: true })) {
+                alert('Укажите корректный email и заполните обязательные поля');
+                return;
+            }
+
+            try {
+                const requestNumber = document.getElementById('requestNumber').value;
+                const fileName = `Заявка_${requestNumber}.pdf`;
+                const email = document.getElementById('initiatorEmail').value.trim();
+
+                const pdfBlob = await generatePdfBlob(fileName);
+                await sendEmailRequest({
+                    to: email,
+                    subject: `Заявка ${requestNumber}`,
+                    fileBlob: pdfBlob
+                });
+
+                showModal();
+            } catch (error) {
+                console.error('Ошибка при отправке документа:', error);
+                alert('Произошла ошибка при отправке. Пожалуйста, попробуйте ещё раз.');
             }
         });
 

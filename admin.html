@@ -500,7 +500,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('news-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveNews()">Сохранить</button>
+                <button class="btn btn-primary" id="news-save-btn" onclick="saveNews()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -530,7 +530,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('event-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveEvent()">Сохранить</button>
+                <button class="btn btn-primary" id="event-save-btn" onclick="saveEvent()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -560,7 +560,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('application-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveApplication()">Сохранить</button>
+                <button class="btn btn-primary" id="application-save-btn" onclick="saveApplication()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -598,7 +598,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('contact-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveContact()">Сохранить</button>
+                <button class="btn btn-primary" id="contact-save-btn" onclick="saveContact()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -624,7 +624,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('faq-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveFaq()">Сохранить</button>
+                <button class="btn btn-primary" id="faq-save-btn" onclick="saveFaq()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -654,7 +654,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('manual-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveManual()">Сохранить</button>
+                <button class="btn btn-primary" id="manual-save-btn" onclick="saveManual()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -680,7 +680,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('helpdesk-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveHelpdeskCategory()">Сохранить</button>
+                <button class="btn btn-primary" id="helpdesk-save-btn" onclick="saveHelpdeskCategory()">Сохранить</button>
             </div>
         </div>
     </div>
@@ -727,7 +727,24 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('it-contact-modal')">Отмена</button>
-                <button class="btn btn-primary" onclick="saveItContact()">Сохранить</button>
+                <button class="btn btn-primary" id="it-contact-save-btn" onclick="saveItContact()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Save Modal -->
+    <div class="modal-overlay" id="confirm-save-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Подтверждение</h3>
+                <button class="modal-close" onclick="closeModal('confirm-save-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-save-text">Вы хотите сохранить изменение?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="confirm-save-cancel">Отменить</button>
+                <button class="btn btn-primary" id="confirm-save-confirm">Сохранить</button>
             </div>
         </div>
     </div>

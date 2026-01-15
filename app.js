@@ -851,6 +851,49 @@ function closeAllModals() {
     document.body.style.overflow = '';
 }
 
+function setSaveButtonText(buttonId, isEdit) {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    button.textContent = isEdit ? 'Сохранить изменения' : 'Сохранить';
+}
+
+function confirmSave(message = 'Вы хотите сохранить изменение?') {
+    const modal = document.getElementById('confirm-save-modal');
+    if (!modal) {
+        return Promise.resolve(window.confirm(message));
+    }
+
+    const text = document.getElementById('confirm-save-text');
+    const confirmBtn = document.getElementById('confirm-save-confirm');
+    const cancelBtn = document.getElementById('confirm-save-cancel');
+
+    if (text) {
+        text.textContent = message;
+    }
+
+    return new Promise(resolve => {
+        const cleanup = () => {
+            confirmBtn?.removeEventListener('click', onConfirm);
+            cancelBtn?.removeEventListener('click', onCancel);
+            modal.classList.remove('active');
+        };
+
+        const onConfirm = () => {
+            cleanup();
+            resolve(true);
+        };
+
+        const onCancel = () => {
+            cleanup();
+            resolve(false);
+        };
+
+        confirmBtn?.addEventListener('click', onConfirm);
+        cancelBtn?.addEventListener('click', onCancel);
+        modal.classList.add('active');
+    });
+}
+
 // Close modal on overlay click
 document.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal-overlay')) {
@@ -1360,6 +1403,7 @@ function openAddNewsModal() {
     document.getElementById('news-form').reset();
     document.getElementById('news-date').value = getCurrentDate();
     document.getElementById('news-modal-title').textContent = 'Добавить новость';
+    setSaveButtonText('news-save-btn', false);
     openModal('news-modal');
 }
 
@@ -1372,6 +1416,7 @@ async function editNews(id) {
     document.getElementById('news-date').value = news.date;
     document.getElementById('news-text').value = news.text;
     document.getElementById('news-modal-title').textContent = 'Редактировать новость';
+    setSaveButtonText('news-save-btn', true);
     openModal('news-modal');
 }
 
@@ -1382,6 +1427,10 @@ async function saveNews() {
 
     if (!title || !date || !text) {
         alert('Заполните все поля');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1410,6 +1459,7 @@ function openAddEventModal() {
     document.getElementById('event-form').reset();
     document.getElementById('event-date').value = getCurrentDate();
     document.getElementById('event-modal-title').textContent = 'Добавить событие';
+    setSaveButtonText('event-save-btn', false);
     openModal('event-modal');
 }
 
@@ -1422,6 +1472,7 @@ async function editEvent(id) {
     document.getElementById('event-date').value = event.date;
     document.getElementById('event-text').value = event.text;
     document.getElementById('event-modal-title').textContent = 'Редактировать событие';
+    setSaveButtonText('event-save-btn', true);
     openModal('event-modal');
 }
 
@@ -1432,6 +1483,10 @@ async function saveEvent() {
 
     if (!title || !date || !text) {
         alert('Заполните все поля');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1459,6 +1514,7 @@ function openAddApplicationModal() {
     currentEditAppId = null;
     document.getElementById('application-form').reset();
     document.getElementById('application-modal-title').textContent = 'Добавить заявку';
+    setSaveButtonText('application-save-btn', false);
     openModal('application-modal');
 }
 
@@ -1471,6 +1527,7 @@ async function editApplication(id) {
     document.getElementById('application-desc').value = app.description;
     document.getElementById('application-url').value = app.url;
     document.getElementById('application-modal-title').textContent = 'Редактировать заявку';
+    setSaveButtonText('application-save-btn', true);
     openModal('application-modal');
 }
 
@@ -1486,6 +1543,10 @@ async function saveApplication() {
 
     if (!isSafeUrl(url)) {
         alert('Ссылка должна быть http/https или относительной');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1513,6 +1574,7 @@ function openAddContactModal() {
     currentEditContactId = null;
     document.getElementById('contact-form').reset();
     document.getElementById('contact-modal-title').textContent = 'Добавить контакт';
+    setSaveButtonText('contact-save-btn', false);
     openModal('contact-modal');
 }
 
@@ -1527,6 +1589,7 @@ async function editContact(id) {
     document.getElementById('contact-phone').value = contact.phone;
     document.getElementById('contact-email').value = contact.email;
     document.getElementById('contact-modal-title').textContent = 'Редактировать контакт';
+    setSaveButtonText('contact-save-btn', true);
     openModal('contact-modal');
 }
 
@@ -1539,6 +1602,10 @@ async function saveContact() {
 
     if (!name || !position) {
         alert('Заполните ФИО и должность');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1566,6 +1633,7 @@ function openAddFaqModal() {
     currentEditFaqId = null;
     document.getElementById('faq-form').reset();
     document.getElementById('faq-modal-title').textContent = 'Добавить FAQ';
+    setSaveButtonText('faq-save-btn', false);
     openModal('faq-modal');
 }
 
@@ -1577,6 +1645,7 @@ async function editFaq(id) {
     document.getElementById('faq-question').value = faq.question;
     document.getElementById('faq-answer').value = faq.answer;
     document.getElementById('faq-modal-title').textContent = 'Редактировать FAQ';
+    setSaveButtonText('faq-save-btn', true);
     openModal('faq-modal');
 }
 
@@ -1586,6 +1655,10 @@ async function saveFaq() {
 
     if (!question || !answer) {
         alert('Заполните вопрос и ответ');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1613,6 +1686,7 @@ function openAddManualModal() {
     currentEditManualId = null;
     document.getElementById('manual-form').reset();
     document.getElementById('manual-modal-title').textContent = 'Добавить мануал';
+    setSaveButtonText('manual-save-btn', false);
     openModal('manual-modal');
 }
 
@@ -1625,6 +1699,7 @@ async function editManual(id) {
     document.getElementById('manual-desc').value = manual.description;
     document.getElementById('manual-url').value = manual.url;
     document.getElementById('manual-modal-title').textContent = 'Редактировать мануал';
+    setSaveButtonText('manual-save-btn', true);
     openModal('manual-modal');
 }
 
@@ -1640,6 +1715,10 @@ async function saveManual() {
 
     if (!isSafeUrl(url)) {
         alert('Ссылка должна быть http/https или относительной');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1667,6 +1746,7 @@ function openAddHelpdeskCategoryModal() {
     currentEditHelpdeskCategoryId = null;
     document.getElementById('helpdesk-form').reset();
     document.getElementById('helpdesk-modal-title').textContent = 'Добавить категорию';
+    setSaveButtonText('helpdesk-save-btn', false);
     openModal('helpdesk-modal');
 }
 
@@ -1678,6 +1758,7 @@ async function editHelpdeskCategory(id) {
     document.getElementById('helpdesk-label').value = category.label;
     document.getElementById('helpdesk-value').value = category.value;
     document.getElementById('helpdesk-modal-title').textContent = 'Редактировать категорию';
+    setSaveButtonText('helpdesk-save-btn', true);
     openModal('helpdesk-modal');
 }
 
@@ -1687,6 +1768,10 @@ async function saveHelpdeskCategory() {
 
     if (!label || !value) {
         alert('Заполните название и значение');
+        return;
+    }
+
+    if (!(await confirmSave())) {
         return;
     }
 
@@ -1716,6 +1801,7 @@ function openAddItContactModal() {
     currentEditItContactId = null;
     document.getElementById('it-contact-form').reset();
     document.getElementById('it-contact-modal-title').textContent = 'Добавить контакт';
+    setSaveButtonText('it-contact-save-btn', false);
     openModal('it-contact-modal');
 }
 
@@ -1731,6 +1817,7 @@ async function editItContact(id) {
     document.getElementById('it-contact-icon').value = contact.icon || '';
     document.getElementById('it-contact-type').value = contact.type || 'other';
     document.getElementById('it-contact-modal-title').textContent = 'Редактировать контакт';
+    setSaveButtonText('it-contact-save-btn', true);
     openModal('it-contact-modal');
 }
 
@@ -1753,6 +1840,10 @@ async function saveItContact() {
     }
 
     const payload = { title, description, value, link, icon, type };
+
+    if (!(await confirmSave())) {
+        return;
+    }
 
     if (currentEditItContactId) {
         await dataManager.updateItContact(currentEditItContactId, payload);
