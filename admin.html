@@ -347,12 +347,17 @@
                 <!-- Contacts Section -->
                 <div id="section-contacts" class="admin-section">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header" style="gap: 12px; flex-wrap: wrap;">
                             <h2 class="card-title">
                                 <span class="icon">👥</span>
                                 Управление контактами
                             </h2>
-                            <button class="btn btn-primary" onclick="openAddContactModal()">+ Добавить</button>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn btn-secondary" onclick="exportContactsCsv()">Экспорт CSV</button>
+                                <button class="btn btn-secondary" onclick="triggerContactsImport()">Импорт CSV</button>
+                                <button class="btn btn-primary" onclick="openAddContactModal()">+ Добавить</button>
+                                <input type="file" id="contacts-csv-input" accept=".csv" style="display:none" onchange="handleContactsImport(event)">
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="item-list" id="admin-contacts-list">
@@ -749,7 +754,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=20260115-2"></script>
+    <script src="app.js?v=20260115-3"></script>
     <script>
         // ============================================
         // Система авторизации

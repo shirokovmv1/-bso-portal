@@ -537,6 +537,26 @@ class DataManager {
         this.saveLocalData(data);
     }
 
+    async replaceContacts(contacts) {
+        if (CONFIG.useServerStorage) {
+            try {
+                const existing = await api.getContacts();
+                for (const contact of existing) {
+                    await api.deleteContact(contact.id);
+                }
+                for (const contact of contacts) {
+                    await api.addContact(contact);
+                }
+                return;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        const data = this.getLocalData();
+        data.contacts = contacts;
+        this.saveLocalData(data);
+    }
+
     // =====================
     // FAQ
     // =====================
@@ -822,6 +842,52 @@ function sanitizeContactHref(href) {
 function isSafeUrl(url) {
     const sanitized = sanitizeUrl(url);
     return sanitized && sanitized !== '#';
+}
+
+function csvEscape(value) {
+    const text = value == null ? '' : String(value);
+    if (/[;"\n\r]/.test(text)) {
+        return `"${text.replace(/"/g, '""')}"`;
+    }
+    return text;
+}
+
+function parseCsvLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i += 1) {
+        const char = line[i];
+        if (char === '"') {
+            const next = line[i + 1];
+            if (inQuotes && next === '"') {
+                current += '"';
+                i += 1;
+            } else {
+                inQuotes = !inQuotes;
+            }
+            continue;
+        }
+        if (char === ';' && !inQuotes) {
+            result.push(current);
+            current = '';
+            continue;
+        }
+        current += char;
+    }
+    result.push(current);
+    return result.map(value => value.trim());
+}
+
+function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
 }
 
 // ============================================
@@ -1624,6 +1690,102 @@ async function deleteContact(id) {
         await dataManager.deleteContact(id);
         renderAdminContacts();
     }
+}
+
+function triggerContactsImport() {
+    const input = document.getElementById('contacts-csv-input');
+    if (input) {
+        input.value = '';
+        input.click();
+    }
+}
+
+async function handleContactsImport(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const text = await file.text();
+    const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    if (lines.length === 0) {
+        alert('CSV файл пуст');
+        return;
+    }
+
+    let startIndex = 0;
+    if (/Ф\.И\.О\./i.test(lines[0]) || /E-?mail/i.test(lines[0])) {
+        startIndex = 1;
+    }
+
+    const contacts = [];
+    for (let i = startIndex; i < lines.length; i += 1) {
+        const columns = parseCsvLine(lines[i]);
+        if (columns.length < 8) {
+            continue;
+        }
+        const name = (columns[1] || '').trim();
+        if (!name) {
+            continue;
+        }
+        const position = (columns[2] || '').trim();
+        const department = (columns[3] || '').trim();
+        const phone = (columns[6] || '').trim();
+        let email = (columns[7] || '').trim();
+        if (email === '-' || email === '—') {
+            email = '';
+        }
+        contacts.push({
+            id: Date.now() + (i - startIndex),
+            name,
+            position,
+            department,
+            phone,
+            email
+        });
+    }
+
+    if (contacts.length === 0) {
+        alert('Не удалось распознать контакты в CSV');
+        return;
+    }
+
+    const confirmed = await confirmSave('Импортировать контакты и заменить текущий список?');
+    if (!confirmed) {
+        return;
+    }
+
+    await dataManager.replaceContacts(contacts);
+    renderAdminContacts();
+    renderContacts();
+}
+
+async function exportContactsCsv() {
+    const contacts = await dataManager.getContacts();
+    const header = [
+        '№',
+        'Ф.И.О.',
+        'Должность',
+        'Компания',
+        'Внутренний номер',
+        'Дата рождения',
+        'Контактный телефон',
+        'E-mail'
+    ];
+    const rows = [header.join(';')];
+    contacts.forEach((contact, index) => {
+        rows.push([
+            index + 1,
+            csvEscape(contact.name),
+            csvEscape(contact.position),
+            csvEscape(contact.department),
+            '',
+            '',
+            csvEscape(contact.phone),
+            csvEscape(contact.email)
+        ].join(';'));
+    });
+
+    const blob = new Blob([rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    downloadBlob(blob, 'contacts.csv');
 }
 
 // FAQ
