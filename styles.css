@@ -649,6 +649,13 @@ td a:hover {
     margin-bottom: 20px;
 }
 
+/* Auto-filled readonly fields */
+.form-input[readonly] {
+    background-color: var(--bg-tertiary);
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
 .form-actions {
     display: flex;
     gap: 12px;
