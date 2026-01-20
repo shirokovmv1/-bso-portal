@@ -22,7 +22,7 @@ function initUsers() {
                 'id' => 2,
                 'username' => 'afateeva',
                 'password' => '$2b$12$HReixGMZdCEoeZ8rrjawZ.TYi3jGadEk388X2uMLm9KMqCHu7msOq',
-                'name' => 'Анна Фатеева',
+                'name' => 'Анастасия Фатеева',
                 'role' => 'admin',
                 'created' => date('Y-m-d H:i:s')
             ],
@@ -30,7 +30,7 @@ function initUsers() {
                 'id' => 3,
                 'username' => 'adminit',
                 'password' => '$2b$12$JjoX2kZ9N3R0dncEfaW9gu/jdMy4H3lcqHDEQB3x7A8ABllyegfe2',
-                'name' => 'Администратор ИТ',
+                'name' => 'Админ Экорд',
                 'role' => 'admin',
                 'created' => date('Y-m-d H:i:s')
             ],
