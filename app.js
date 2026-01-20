@@ -3180,8 +3180,7 @@ function buildHelpdeskPdfDefinition(data) {
 async function initHelpdeskForm() {
     const form = document.getElementById('helpdesk-form');
     if (!form) return;
-    const meta = await getHelpdeskMeta(false);
-    setHelpdeskMetaFields(meta);
+    setHelpdeskMetaFields({ requestNumber: '', createdAt: '' });
 }
 
 async function saveHelpdeskPdf() {
