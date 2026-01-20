@@ -12,9 +12,33 @@ function initUsers() {
         $defaultUsers = [
             [
                 'id' => 1,
-                'username' => 'admin',
-                'password' => password_hash('admin123', PASSWORD_DEFAULT),
-                'name' => 'Администратор',
+                'username' => 'mshirokov',
+                'password' => '$2b$12$N02rsFK5mL1tfXjyzBKkreJ2mypT7eJLTcIsAGHCBHMhBiLuRclrK',
+                'name' => 'Михаил Широков',
+                'role' => 'admin',
+                'created' => date('Y-m-d H:i:s')
+            ],
+            [
+                'id' => 2,
+                'username' => 'afateeva',
+                'password' => '$2b$12$HReixGMZdCEoeZ8rrjawZ.TYi3jGadEk388X2uMLm9KMqCHu7msOq',
+                'name' => 'Анна Фатеева',
+                'role' => 'admin',
+                'created' => date('Y-m-d H:i:s')
+            ],
+            [
+                'id' => 3,
+                'username' => 'adminit',
+                'password' => '$2b$12$JjoX2kZ9N3R0dncEfaW9gu/jdMy4H3lcqHDEQB3x7A8ABllyegfe2',
+                'name' => 'Администратор ИТ',
+                'role' => 'admin',
+                'created' => date('Y-m-d H:i:s')
+            ],
+            [
+                'id' => 4,
+                'username' => 'skashirtsev',
+                'password' => '$2b$12$.luxbLGzIUclf9TiMq.IC.pFZ3f.ZgAeUbidlHxCX6iDzdX72JBpC',
+                'name' => 'Сергей Каширцев',
                 'role' => 'admin',
                 'created' => date('Y-m-d H:i:s')
             ]

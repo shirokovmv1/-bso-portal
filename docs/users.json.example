@@ -1,9 +1,30 @@
 [
   {
     "id": 1,
-    "username": "admin",
-    "name": "Администратор",
+    "username": "mshirokov",
+    "name": "Михаил Широков",
     "role": "admin",
-    "password": "$2y$10$REPLACE_WITH_PASSWORD_HASH"
+    "password": "$2b$12$N02rsFK5mL1tfXjyzBKkreJ2mypT7eJLTcIsAGHCBHMhBiLuRclrK"
+  },
+  {
+    "id": 2,
+    "username": "afateeva",
+    "name": "Анна Фатеева",
+    "role": "admin",
+    "password": "$2b$12$HReixGMZdCEoeZ8rrjawZ.TYi3jGadEk388X2uMLm9KMqCHu7msOq"
+  },
+  {
+    "id": 3,
+    "username": "adminit",
+    "name": "Администратор ИТ",
+    "role": "admin",
+    "password": "$2b$12$JjoX2kZ9N3R0dncEfaW9gu/jdMy4H3lcqHDEQB3x7A8ABllyegfe2"
+  },
+  {
+    "id": 4,
+    "username": "skashirtsev",
+    "name": "Сергей Каширцев",
+    "role": "admin",
+    "password": "$2b$12$.luxbLGzIUclf9TiMq.IC.pFZ3f.ZgAeUbidlHxCX6iDzdX72JBpC"
   }
 ]
