@@ -3028,6 +3028,7 @@ async function deleteItContact(id) {
 // ============================================
 
 const HELP_DESK_COUNTER_KEY = 'bso_helpdesk_counter';
+const HELP_DESK_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 function formatMoscowDateTime(date) {
     const formatted = date.toLocaleString('ru-RU', {
@@ -3136,9 +3137,9 @@ function validateHelpdeskData(data) {
         alert('Укажите email сотрудника.');
         return false;
     }
-    const phonePattern = /^\+7 \d{3} \d{3} \d{2} \d{2}$/;
+    const phonePattern = /^\+7\d{10}$/;
     if (!phonePattern.test(data.phone)) {
-        alert('Телефон должен быть в формате +7 123 456 78 90.');
+        alert('Телефон должен быть в формате +71234567890.');
         return false;
     }
     if (!data.category) {
@@ -3181,6 +3182,18 @@ async function initHelpdeskForm() {
     const form = document.getElementById('helpdesk-form');
     if (!form) return;
     setHelpdeskMetaFields({ requestNumber: '', createdAt: '' });
+
+    const fileInput = document.getElementById('helpdesk-attachment');
+    if (fileInput && !fileInput.dataset.bound) {
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files?.[0];
+            if (file && file.size > HELP_DESK_MAX_FILE_SIZE) {
+                fileInput.value = '';
+                openModal('helpdesk-file-size-modal');
+            }
+        });
+        fileInput.dataset.bound = 'true';
+    }
 }
 
 async function saveHelpdeskPdf() {
@@ -3227,7 +3240,12 @@ async function sendHelpdeskRequest() {
 
             const fileInput = document.getElementById('helpdesk-attachment');
             if (fileInput?.files?.[0]) {
-                formData.append('attachment', fileInput.files[0]);
+                const file = fileInput.files[0];
+                if (file.size > HELP_DESK_MAX_FILE_SIZE) {
+                    openModal('helpdesk-file-size-modal');
+                    return;
+                }
+                formData.append('attachment', file);
             }
 
             const response = await fetch(`${CONFIG.apiUrl}/helpdesk.php?action=submit`, {

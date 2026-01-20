@@ -7,6 +7,7 @@ define('HELPDESK_COUNTER_FILE', DATA_DIR . 'helpdesk_counter.json');
 define('HELPDESK_REGISTRY_FILE', DATA_DIR . 'helpdesk_registry.csv');
 define('HELPDESK_FROM_EMAIL', 'no_reply@bso-cc.ru');
 define('HELPDESK_TO_EMAIL', 'helpdesk@bso-cc.ru');
+define('HELPDESK_MAX_FILE_SIZE', 5 * 1024 * 1024);
 
 function getCounter() {
     if (!file_exists(HELPDESK_COUNTER_FILE)) {
@@ -137,8 +138,20 @@ if ($action === 'submit') {
     if (!$name || !$email || !$phone || !$category || !$description || !$pdfBase64) {
         error('Заполните все обязательные поля', 400);
     }
+    if (!preg_match('/^\+7\d{10}$/', $phone)) {
+        error('Телефон должен быть в формате +71234567890', 400);
+    }
 
     $attachments = [];
+    if (!empty($_FILES['attachment'])) {
+        if ($_FILES['attachment']['error'] === UPLOAD_ERR_INI_SIZE || $_FILES['attachment']['error'] === UPLOAD_ERR_FORM_SIZE) {
+            error('Размер загружаемого файла более 5Мб', 400);
+        }
+        if ($_FILES['attachment']['size'] > HELPDESK_MAX_FILE_SIZE) {
+            error('Размер загружаемого файла более 5Мб', 400);
+        }
+    }
+
     if (!empty($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['attachment'];
         $content = file_get_contents($file['tmp_name']);

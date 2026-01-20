@@ -99,7 +99,7 @@
                             <div class="dashboard-grid">
                                 <div class="form-group">
                                     <label class="form-label" for="helpdesk-phone">Телефон для связи *</label>
-                                    <input type="text" id="helpdesk-phone" class="form-input" placeholder="+7 123 456 78 90" required>
+                                    <input type="text" id="helpdesk-phone" class="form-input" placeholder="+71234567890" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="helpdesk-category">Категория проблемы *</label>
@@ -182,8 +182,23 @@
         </main>
     </div>
 
+    <div class="modal-overlay" id="helpdesk-file-size-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Ошибка загрузки</h3>
+                <button class="modal-close" onclick="closeModal('helpdesk-file-size-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Размер загружаемого файла более 5Мб.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('helpdesk-file-size-modal')">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="app.js?v=20260120-2"></script>
+    <script src="app.js?v=20260120-3"></script>
 </body>
 </html>
